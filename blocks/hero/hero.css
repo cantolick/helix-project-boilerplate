@@ -9,10 +9,17 @@ main .hero-container {
 }
   
 main .hero {
+  height: 100vh;
   position: relative;
-  padding: 32px;
-  min-height: 300px;
   background: rgba(20,76,125,0.8);
+  text-align: center;
+  background-size: cover;
+  padding: 15px;
+  overflow: hidden;
+}
+
+main .hero > div > div{
+  padding-top: 3em;
 }
 
 main .hero h1 {
@@ -20,6 +27,19 @@ main .hero h1 {
   margin-left: auto;
   margin-right: auto;
   color: white;
+  font-weight: 900;
+  font-size: 5em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 0.9em;
+  margin-bottom: 0;
+}
+main .hero h2 {
+  color: #5ea7e5;
+  font-weight: 500;
+  font-size: 2.25em;
+  margin-bottom: 15px;
+  margin: 0;
 }
 
 main .hero picture {
