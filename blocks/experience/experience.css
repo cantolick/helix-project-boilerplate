@@ -1,0 +1,80 @@
+.experience > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.experience > ul > li {
+  background-color: var(--background-color);
+  display: flex;
+  align-items: flex-start; 
+}
+
+.vtimeline-date {
+  width: 260px; /* Fixed width */
+  text-align: right;
+  font-weight: 300;
+  color: #374054;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.vtimeline-content {
+  padding: 15px;
+  text-align: left;
+  flex-grow: 1; /* Allow to grow and fill remaining space */
+}
+
+.vtimeline-content h3 {
+  font-size: 1.5em;
+  font-weight: 300;
+  color: #374054;
+  display: inline-block;
+  margin: 0
+}
+
+.vtimeline-content h4 {
+  font-size: 1.2em;
+  font-weight: 300;
+  color: #6e7880;
+  margin: 0 0 15px 0
+}
+
+.vtimeline-content p {
+  color: #6c7882;
+  font-size: .9em;
+  margin: 0
+}
+.vtimeline-content {
+  margin-left: 1.3em;
+  margin-bottom: .85em;
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  padding: 15px;
+  border-radius: 3px;
+  text-align: left;
+}
+.vtimeline-icon {
+  position: relative;
+  color: #fff;
+  width: 50px;
+  height: 50px;
+  background: #1b67a9;
+  border-radius: 50%;
+  z-index: 99;
+  margin-left: 20px; /* Adjust margin as needed */
+  flex-shrink: 0; /* Prevent shrinking */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.vtimeline-icon i {
+  font-size: 2em;
+}
+
+.fa {
+  font: normal normal normal 14px / 1 FontAwesome;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
