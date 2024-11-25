@@ -42,6 +42,56 @@ main .hero h2 {
   margin: 0;
 }
 
+@media only screen and (max-width:992px) {
+  main .hero  {
+      height: auto;
+      min-height: auto;
+      max-height: auto;
+      padding: 100px 15px
+  }
+
+  main .hero  {
+      position: relative;
+      transform: none;
+      left: auto;
+      top: auto
+  }
+
+  main .hero h1 {
+      font-size: 3em
+  }
+
+  main .hero h2 {
+      font-size: 1.75em
+  }
+}
+@media only screen and (max-width:480px) {
+  main .hero h1 {
+      font-size: 1.5em
+  }
+
+  main .hero h2 {
+      font-size: 1em
+  }
+
+  main .hero a {
+      font-size: .9em;
+      padding: 5px 10px
+  }
+}
+@media only screen and (max-width:768px) {
+  main .hero h1 {
+      font-size: 2em
+  }
+
+  main .hero h2 {
+      font-size: 1.3em
+  }
+
+  main .hero a {
+      padding: 10px 20px
+  }
+}
 main .hero picture {
   position: absolute;
   z-index: -1;
