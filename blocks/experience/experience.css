@@ -1,27 +1,63 @@
-.experience > ul {
+.experience>ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.experience > ul > li {
+.experience>ul>li {
   background-color: var(--background-color);
-  display: flex;
-  align-items: flex-start; 
+}
+
+.vtimeline-icon {
+  display: none;
 }
 
 .vtimeline-date {
-  width: 260px; /* Fixed width */
-  text-align: right;
   font-weight: 300;
   color: #374054;
-  flex-shrink: 0; /* Prevent shrinking */
+  flex-shrink: 0;
+  /* Prevent shrinking */
+}
+
+@media (min-width: 600px) {
+  .experience>ul>li {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .vtimeline-date {
+    text-align: right;
+    width: 6em;
+  }
+
+  .vtimeline-icon {
+    position: relative;
+    color: #fff;
+    width: 50px;
+    height: 50px;
+    background: #1b67a9;
+    border-radius: 50%;
+    z-index: 99;
+    margin-left: 20px;
+    /* Adjust margin as needed */
+    flex-shrink: 0;
+    /* Prevent shrinking */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .vtimeline-icon i {
+    font-size: 2em;
+  }
+
 }
 
 .vtimeline-content {
   padding: 15px;
   text-align: left;
-  flex-grow: 1; /* Allow to grow and fill remaining space */
+  flex-grow: 1;
+  /* Allow to grow and fill remaining space */
 }
 
 .vtimeline-content h3 {
@@ -44,6 +80,7 @@
   font-size: .9em;
   margin: 0
 }
+
 .vtimeline-content {
   margin-left: 1.3em;
   margin-bottom: .85em;
@@ -52,24 +89,6 @@
   padding: 15px;
   border-radius: 3px;
   text-align: left;
-}
-.vtimeline-icon {
-  position: relative;
-  color: #fff;
-  width: 50px;
-  height: 50px;
-  background: #1b67a9;
-  border-radius: 50%;
-  z-index: 99;
-  margin-left: 20px; /* Adjust margin as needed */
-  flex-shrink: 0; /* Prevent shrinking */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.vtimeline-icon i {
-  font-size: 2em;
 }
 
 .fa {
