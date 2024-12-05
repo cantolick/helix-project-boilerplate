@@ -85,6 +85,16 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
   }
 }
 
+function closeMenuOnLinkClick(nav, navSections) {
+  navSections.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      if (!isDesktop.matches) {
+        toggleMenu(nav, navSections);
+      }
+    });
+  });
+}
+
 /**
  * decorates the header, mainly the nav
  * @param {Element} block The header block element
@@ -121,6 +131,7 @@ export default async function decorate(block) {
           }
         });
       });
+      closeMenuOnLinkClick(nav, navSections);
     }
 
     // hamburger for mobile
