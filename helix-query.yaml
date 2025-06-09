@@ -7,18 +7,19 @@ indices:
     target: /query-index.json
     properties:
       title:
-        selectFirst: "table tr:nth-child(2) td:nth-child(2)"
-        value: |
-          return el.textContent.trim();
-      description:
-        selectFirst: "table tr:nth-child(3) td:nth-child(2)"
-        value: |
-          return el.textContent.trim();
-      image:
-        selectFirst: "table tr:nth-child(4) td:nth-child(2)"
+        selectFirst: "main h2, main h1"
         value: |
           return el.textContent.trim();
       lastModified:
-        selectFirst: "table tr:nth-child(5) td:nth-child(2)"
+        selectFirst: "main h4, main h3"
+        value: |
+          return el.textContent.trim().match(/[A-Za-z]+\s\d{4}/)?.[0] || "";
+      description:
+        selectFirst: "main p"
         value: |
           return el.textContent.trim();
+      content:
+        select: "main p"
+        value: |
+          // Join all paragraph texts into a single string
+          return Array.from(els).map(e => e.textContent.trim()).join('\n\n');
