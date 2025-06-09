@@ -1,0 +1,24 @@
+indices:
+  blog-index:
+    include:
+      - /blog/
+    exclude:
+      - /api/
+    target: /query-index.json
+    properties:
+      title:
+        selectFirst: "table tr:nth-child(2) td:nth-child(2)"
+        value: |
+          return el.textContent.trim();
+      description:
+        selectFirst: "table tr:nth-child(3) td:nth-child(2)"
+        value: |
+          return el.textContent.trim();
+      image:
+        selectFirst: "table tr:nth-child(4) td:nth-child(2)"
+        value: |
+          return el.textContent.trim();
+      lastModified:
+        selectFirst: "table tr:nth-child(5) td:nth-child(2)"
+        value: |
+          return el.textContent.trim();
