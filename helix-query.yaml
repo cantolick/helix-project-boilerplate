@@ -7,13 +7,14 @@ indices:
     target: /query-index.json
     properties:
       title:
-        selectFirst: "main h2, main h1"
+        selectFirst: "main h1, main h2, main .blog-title"
         value: |
           return el.textContent.trim();
       lastModified:
-        selectFirst: "main h4, main h3"
+        selectFirst: "main time, main h4, main h3"
         value: |
-          return el.textContent.trim().match(/[A-Za-z]+\s\d{4}/)?.[0] || "";
+          // Try to get datetime attribute if available, else fallback to text
+          return el.getAttribute('datetime') || el.textContent.trim().match(/[A-Za-z]+\s\d{4}/)?.[0] || el.textContent.trim();
       description:
         selectFirst: "main p"
         value: |
@@ -22,3 +23,7 @@ indices:
         select: "main p"
         value: |
           return Array.from(els).map(e => e.textContent.trim()).join('\n\n');
+      image:
+        selectFirst: "main img"
+        value: |
+          return el ? el.src : null;
