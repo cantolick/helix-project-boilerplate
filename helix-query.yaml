@@ -17,7 +17,8 @@ indices:
         value: textContent(el)
       content:
         select: "main p"
-        values: textContent(el)
+        value: |
+          return els.map(el => textContent(el)).join('\n\n');
       image:
         selectFirst: "main img"
         value: attribute(el, "src")
@@ -31,4 +32,5 @@ indices:
         select: "main .tag, main [data-tag]"
         values: textContent(el)
       path:
+        selectFirst: "body"
         value: path
