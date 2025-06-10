@@ -13,7 +13,6 @@ indices:
       lastModified:
         selectFirst: "main time, main h4, main h3"
         value: |
-          // Try to get datetime attribute if available, else fallback to text
           return el.getAttribute('datetime') || el.textContent.trim().match(/[A-Za-z]+\s\d{4}/)?.[0] || el.textContent.trim();
       description:
         selectFirst: "main p"
