@@ -7,30 +7,24 @@ indices:
     target: /query-index.json
     properties:
       title:
-        selectFirst: "main h1"
+        selectFirst: "main > div > h1, main h1, main h2"
         value: textContent(el)
       lastModified:
-        selectFirst: "main time"
-        value: attribute(el, "datetime")
+        selectFirst: "main time, main h4, main h3"
+        value: textContent(el)
       description:
-        selectFirst: "main p"
+        selectFirst: "main > div:nth-child(n+4) p, main p"
         value: textContent(el)
       content:
-        select: "main p"
+        select: "main > div:nth-child(n+4) p, main p"
         value: |
-          return els.map(el => textContent(el)).join('\n\n');
+          words(textContent(el), 0, 20)
       image:
-        selectFirst: "main img"
+        selectFirst: "main > div img, main img"
         value: attribute(el, "src")
       author:
-        selectFirst: "main .author, main [data-author]"
-        value: textContent(el)
-      category:
-        selectFirst: "main .category, main [data-category]"
-        value: textContent(el)
-      tags:
-        select: "main .tag, main [data-tag]"
-        values: textContent(el)
+        selectFirst: "main > div p"
+        value: match(el, '[bB]y (.*)')
       path:
         selectFirst: "body"
         value: path
