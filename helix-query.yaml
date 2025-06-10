@@ -3,26 +3,32 @@ indices:
     include:
       - /blog/**
     exclude:
-      - /api/
+      - /api/**
     target: /query-index.json
     properties:
       title:
-        selectFirst: "main h1, main h2, main .blog-title"
-        value: |
-          return el.textContent.trim();
+        selectFirst: "main h1"
+        value: textContent(el)
       lastModified:
-        selectFirst: "main time, main h4, main h3"
-        value: |
-          return el.getAttribute('datetime') || el.textContent.trim().match(/[A-Za-z]+\s\d{4}/)?.[0] || el.textContent.trim();
+        selectFirst: "main time"
+        value: attribute(el, "datetime")
       description:
         selectFirst: "main p"
-        value: |
-          return el.textContent.trim();
+        value: textContent(el)
       content:
         select: "main p"
-        value: |
-          return Array.from(els).map(e => e.textContent.trim()).join('\n\n');
+        values: textContent(el)
       image:
         selectFirst: "main img"
-        value: |
-          return el ? el.src : null;
+        value: attribute(el, "src")
+      author:
+        selectFirst: "main .author, main [data-author]"
+        value: textContent(el)
+      category:
+        selectFirst: "main .category, main [data-category]"
+        value: textContent(el)
+      tags:
+        select: "main .tag, main [data-tag]"
+        values: textContent(el)
+      path:
+        value: path
