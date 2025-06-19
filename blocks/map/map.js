@@ -116,10 +116,6 @@ function addMarkersToMap() {
       popupContent += `<p style="text-align: left; font-size: 0.9em;"><strong>Directions:</strong> ${park.directions}</p>`;
     }
 
-    if (park.address) {
-      popupContent += `<p style="font-size: 0.8em;">${park.address}</p>`;
-    }
-
     if (park.url) {
       popupContent += `<p><a href="https://www.dnr.state.mn.us${park.url}" target="_blank" style="color: #007bff;">https://www.dnr.state.mn.us${park.url}</a></p>`;
     }
