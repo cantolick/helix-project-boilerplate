@@ -20,6 +20,8 @@
 .parks-map-wrapper .header h1 {
   margin: 0;
   font-size: 2em;
+  color:#d8effa;
+
 }
 
 .parks-map-wrapper .stats {
@@ -71,11 +73,11 @@
   border: 2px solid #333;
 }
 
-.parks-map-wrapper .visited { 
+.parks-map-wrapper .legend-item .visited { 
   background-color: #28a745; 
 }
 
-.parks-map-wrapper .not-visited { 
+.parks-map-wrapper .legend-item .not-visited { 
   background-color: #dc3545; 
 }
 
@@ -144,6 +146,7 @@
   
   .parks-map-wrapper .header h1 {
     font-size: 1.5em;
+    color: #d8effa;
   }
   
   .parks-map-wrapper .parks-map-container {
