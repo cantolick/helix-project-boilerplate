@@ -40,7 +40,7 @@ function initializeMap(container) {
 
   // Initialize the map centered on Minnesota with zoom limits
   map = window.L.map(mapDiv, {
-    minZoom: 6, // Can't zoom out past this level
+    minZoom: 5, // Can't zoom out past this level
     maxZoom: 18, // Can't zoom in past this level
   }).setView([46.7296, -94.6859], 6);
 
@@ -97,15 +97,36 @@ function addMarkersToMap() {
       fillOpacity: 0.8,
     }).addTo(map);
 
-    marker.bindPopup(`
-      <div style="text-align: center;">
+    // Build popup content with new fields
+    let popupContent = `
+      <div style="text-align: center; max-width: 300px;">
         <h3>${park.name}</h3>
-        <p>${park.city}, ${park.state || 'MN'}</p>
         <p><strong>Status:</strong> ${park.visited ? 'Visited' : 'Not Visited'}</p>
-        ${park.address ? `<p><small>${park.address}</small></p>` : ''}
-      </div>
-    `);
+    `;
 
+    if (park.description) {
+      popupContent += `<p style="text-align: left; font-size: 0.9em;"><strong>Description:</strong> ${park.description}</p>`;
+    }
+
+    if (park.notes) {
+      popupContent += `<p style="text-align: left; font-size: 0.9em;"><strong>Notes:</strong> ${park.notes}</p>`;
+    }
+
+    if (park.directions) {
+      popupContent += `<p style="text-align: left; font-size: 0.9em;"><strong>Directions:</strong> ${park.directions}</p>`;
+    }
+
+    if (park.address) {
+      popupContent += `<p style="font-size: 0.8em;">${park.address}</p>`;
+    }
+
+    if (park.url) {
+      popupContent += `<p><a href="https://www.dnr.state.mn.us${park.url}" target="_blank" style="color: #007bff;">https://www.dnr.state.mn.us${park.url}</a></p>`;
+    }
+
+    popupContent += '</div>';
+
+    marker.bindPopup(popupContent);
     markers.push(marker);
   });
 }
@@ -129,11 +150,25 @@ function createParkList(container) {
   parks.forEach((park) => {
     const item = document.createElement('div');
     item.className = park.visited ? 'park-item visited' : 'park-item not-visited';
-    item.innerHTML = `
-      <strong>${park.name}</strong><br>
-      <small>${park.city}, ${park.state || 'MN'}</small>
+
+    let itemContent = `
+      <strong>${park.name}</strong>
       ${park.visited ? '<br><small><em>✓ Visited</em></small>' : ''}
     `;
+
+    if (park.description) {
+      itemContent += `<br><small style="color: #666;">${park.description}</small>`;
+    }
+
+    if (park.notes) {
+      itemContent += `<br><strong>Notes: </strong><small style="color:rgba(68, 68, 68, 0.58); font-style: italic;">${park.notes}</small>`;
+    }
+
+    if (park.url) {
+      itemContent += `<br><small><a href="https://www.dnr.state.mn.us${park.url}" target="_blank" style="color: #007bff;">https://www.dnr.state.mn.us${park.url}</a></small>`;
+    }
+
+    item.innerHTML = itemContent;
     parkItems.appendChild(item);
   });
 }
