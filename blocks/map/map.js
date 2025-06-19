@@ -30,46 +30,56 @@ async function loadDependencies() {
 
 // Initialize the map
 function initializeMap(container) {
-  console.log('Initializing parks map...');
-
   // Find the map div within the container
   const mapDiv = container.querySelector('.parks-map-container');
 
-  // Initialize the map centered on Minnesota
-  map = window.L.map(mapDiv).setView([46.7296, -94.6859], 6);
+  // Ensure the container has proper dimensions before initializing
+  if (mapDiv.offsetHeight === 0) {
+    mapDiv.style.height = '600px';
+  }
+
+  // Initialize the map centered on Minnesota with zoom limits
+  map = window.L.map(mapDiv, {
+    minZoom: 6, // Can't zoom out past this level
+    maxZoom: 18, // Can't zoom in past this level
+  }).setView([46.7296, -94.6859], 6);
 
   // Add tile layer
   window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
   }).addTo(map);
 
-  console.log('Map initialized successfully');
+  // Force map to recognize its container size
+  setTimeout(() => {
+    map.invalidateSize();
+  }, 100);
 }
 
 // Load parks data from JSON
 async function loadParks() {
-  console.log('Loading parks data from JSON...');
-
   try {
     const response = await fetch('parks.json');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    parks = data.data;
-    console.log(`Loaded ${parks.length} parks from JSON`);
+
+    // Convert string values to proper types
+    parks = data.data.map((park) => ({
+      ...park,
+      visited: park.visited === 'true',
+      lat: parseFloat(park.lat),
+      lng: parseFloat(park.lng),
+    }));
 
     return true;
   } catch (error) {
-    console.error('Error loading parks from JSON:', error);
     return false;
   }
 }
 
 // Add markers to the map
 function addMarkersToMap() {
-  console.log('Adding markers to map...');
-
   parks.forEach((park) => {
     // Use provided coordinates or estimate based on city
     const lat = park.lat || (46.7296 + (Math.random() - 0.5) * 4);
@@ -98,8 +108,6 @@ function addMarkersToMap() {
 
     markers.push(marker);
   });
-
-  console.log(`Added ${markers.length} markers to map`);
 }
 
 // Update statistics
@@ -111,14 +119,10 @@ function updateStats(container) {
   container.querySelector('#visitedCount').textContent = visitedCount;
   container.querySelector('#totalCount').textContent = totalCount;
   container.querySelector('#percentageCount').textContent = `${percentage}%`;
-
-  console.log(`Stats updated: ${visitedCount}/${totalCount} (${percentage}%)`);
 }
 
 // Create park list
 function createParkList(container) {
-  console.log('Creating park list...');
-
   const parkItems = container.querySelector('#parkItems');
   parkItems.innerHTML = '';
 
@@ -132,8 +136,6 @@ function createParkList(container) {
     `;
     parkItems.appendChild(item);
   });
-
-  console.log('Park list created');
 }
 
 // Toggle park list visibility
@@ -141,7 +143,6 @@ function toggleParkList(container) {
   const parkList = container.querySelector('#parkList');
   const isVisible = parkList.style.display !== 'none';
   parkList.style.display = isVisible ? 'none' : 'block';
-  console.log(`Park list ${isVisible ? 'hidden' : 'shown'}`);
 }
 
 // Show error message
@@ -160,8 +161,6 @@ function showError(container, error) {
 
 // Main block decoration function (Franklin style)
 export default async function decorate(block) {
-  console.log('Decorating parks-map block...');
-
   // Create the HTML structure
   block.innerHTML = `
     <div class="parks-map-wrapper">
@@ -228,17 +227,14 @@ export default async function decorate(block) {
       throw new Error('Failed to load parks data');
     }
 
-    // Initialize map
-    initializeMap(block);
-
-    // Add markers and update UI
-    addMarkersToMap();
-    createParkList(block);
-    updateStats(block);
-
-    console.log('Parks map block loaded successfully');
+    // Small delay to ensure DOM is ready, then initialize map
+    setTimeout(() => {
+      initializeMap(block);
+      addMarkersToMap();
+      createParkList(block);
+      updateStats(block);
+    }, 50);
   } catch (error) {
-    console.error('Error initializing parks map:', error);
     showError(block, error);
   }
 }
