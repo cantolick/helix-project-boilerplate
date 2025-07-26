@@ -8,7 +8,10 @@ indices:
     properties:
       date:
         select: 'meta[name="date"]'
-        value: parseTimestamp(attribute(el, "content"), "M/D/YYYY")
+        value: |
+          parseTimestamp(attribute(el, "content"), "M/D/YYYY") || 
+          parseTimestamp(attribute(el, "content"), "MM/DD/YYYY") || 
+          parseTimestamp(attribute(el, "content"), "YYYY-MM-DD")
       title:
         selectFirst: "main > div > h1, main h1, main h2"
         value: textContent(el)
