@@ -6,6 +6,9 @@ indices:
       - /api/**
     target: /query-index.json
     properties:
+      date:
+        select: 'meta[name="date"]'
+        value: parseTimestamp(attribute(el, "content"), "M/D/YYYY")
       title:
         selectFirst: "main > div > h1, main h1, main h2"
         value: textContent(el)
