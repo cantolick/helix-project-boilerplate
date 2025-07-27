@@ -7,7 +7,6 @@ let blogData = [];
 // const itemsPerPage = 6;
 // const isLoading = false;
 let hasMoreContent = true;
-
 /**
  * Fetch blog data from query index
  */
@@ -18,13 +17,23 @@ async function fetchBlogData() {
 
     const result = await response.json();
     blogData = result.data || [];
+
+    // Sort by date (newest first) - date field is a Unix timestamp
+    blogData.sort((a, b) => {
+      // Handle cases where date might be missing
+      const dateA = a.date || 0;
+      const dateB = b.date || 0;
+
+      // Sort in descending order (newest first)
+      return dateB - dateA;
+    });
+
     return blogData;
   } catch (error) {
     console.error('Error fetching blog data:', error);
     return [];
   }
 }
-
 /**
  * Format date from time element or text
  */
