@@ -31,3 +31,9 @@ indices:
       path:
         selectFirst: "body"
         value: path
+      category:
+        selectFirst: "main > div:nth-child(9) p, main p"
+        value: textContent(el)
+      tags:
+        selectFirst: "main > div:nth-child(10) p, main p"
+        value: textContent(el)
