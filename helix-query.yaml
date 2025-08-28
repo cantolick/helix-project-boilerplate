@@ -32,8 +32,8 @@ indices:
         selectFirst: "body"
         value: path
       category:
-        selectFirst: "main > div:nth-child(9) p, main p"
-        value: textContent(el)
+        select: 'meta[name="category"]'
+        value: attribute(el, "content")
       tags:
-        selectFirst: "main > div:nth-child(10) p, main p"
-        value: textContent(el)
+        selectFirst: 'meta[name="tags"]'
+        values: attribute(el, "content")
