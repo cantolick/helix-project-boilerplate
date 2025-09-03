@@ -25,15 +25,12 @@ indices:
       image:
         selectFirst: "main > div img, main img"
         value: attribute(el, "src")
-      author:
-        selectFirst: "main > div p"
-        value: match(el, '[bB]y (.*)')
       path:
         selectFirst: "body"
         value: path
       category:
         select: 'meta[name="category"]'
         value: attribute(el, "content")
-      tags:
-        selectFirst: 'meta[name="tags"]'
-        values: attribute(el, "content")
+      tag:
+        select: meta[property="article:tag"]
+        value: attribute(el, "content")
