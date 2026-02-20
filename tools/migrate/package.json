@@ -8,6 +8,7 @@
     "dry-run": "node migrate.js --dry-run"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "node-html-parser": "^6.1.13"
   }
 }

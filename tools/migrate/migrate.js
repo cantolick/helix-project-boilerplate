@@ -13,6 +13,7 @@
  *   node migrate.js --dry-run
  */
 
+import 'dotenv/config';
 import { parse } from 'node-html-parser';
 
 // ─── Config ────────────────────────────────────────────────────────────────
