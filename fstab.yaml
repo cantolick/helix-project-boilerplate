@@ -1,5 +1,5 @@
 mountpoints:
   /:
-    url: "https://author-p110511-e1076828.adobeaemcloud.com/bin/franklin.delivery/cantolick/helix-project-boilerplate/main"
+    url: "https://author-p110511-e1076828.adobeaemcloud.com/bin/franklin.delivery/cantolick/helix-project-boilerplate/eds2026"
     type: "markup"
     suffix: ".html"
