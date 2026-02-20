@@ -1,0 +1,5 @@
+{
+  "headers": [
+    { "path": "/**", "cache-control": "max-age=600" }
+  ]
+}
