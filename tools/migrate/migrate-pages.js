@@ -28,12 +28,23 @@ const QUERY_INDEX = `${EDS_BASE}/query-index.json`;
 const AEM_HOST = process.env.AEM_HOST || 'https://author-p110511-e1076828.adobeaemcloud.com';
 const AEM_TOKEN = process.env.AEM_TOKEN || '';
 
-// Where pages will be created in the AEM content tree
+// Where blog pages will be created in the AEM content tree
 const PAGE_PARENT_PATH = '/content/helix-project-boilerplate/blog';
+
+// Root site path for top-level pages (index, about, nav, footer)
+const SITE_ROOT_PATH = '/content/helix-project-boilerplate';
 
 // Franklin page template — confirmed via /content/aem-sites-with-edge-delivery-services-template/index/jcr:content.json
 const PAGE_TEMPLATE = '/libs/core/franklin/templates/page';
 const PAGE_RESOURCE_TYPE = 'core/franklin/components/page/v1/page';
+
+// Top-level EDS pages to migrate (not in query index)
+const EXTRA_PAGES = [
+  { slug: 'index', sourcePath: '/index', title: 'Home' },
+  { slug: 'about', sourcePath: '/about', title: 'About' },
+  { slug: 'nav', sourcePath: '/nav', title: 'Nav' },
+  { slug: 'footer', sourcePath: '/footer', title: 'Footer' },
+];
 
 const DRY_RUN = process.argv.includes('--dry-run');
 
@@ -184,10 +195,11 @@ async function ensurePagePath(fullPath) {
  *   jcr:content/root/default → rich text content area with body HTML
  */
 async function createPage(post) {
-  const pagePath = `${PAGE_PARENT_PATH}/${post.slug}`;
+  const parentPath = post._parentPath || PAGE_PARENT_PATH;
+  const pagePath = `${parentPath}/${post.slug}`;
 
   // Use WCM createPage command (same as AEM Sites console "Create Page")
-  await createPageNode(PAGE_PARENT_PATH, post.slug, post.title);
+  await createPageNode(parentPath, post.slug, post.title);
 
   // Patch the page with metadata using the WCM updatePage command
   // This handles versioning correctly (checks out automatically)
@@ -213,7 +225,7 @@ async function createPage(post) {
   metaForm.append('_charset_', 'utf-8');
   metaForm.append('jcr:content/eds:sourcePath', post.sourcePath);
 
-  const metaRes = await fetch(`${AEM_HOST}${pagePath}`, {
+  const metaRes = await fetch(`${AEM_HOST}${pagePath}`, { // pagePath is local to createPage
     method: 'POST',
     headers: { Authorization: `Bearer ${AEM_TOKEN}` },
     body: metaForm,
@@ -266,27 +278,34 @@ async function run() {
 
   const results = { created: [], skipped: [], failed: [] };
 
-  // 3. Process each post
-  for (const meta of posts) {
-    log(`Processing: ${meta.path}`);
-
+  /**
+   * Helper to process a single page (used for both blog posts and extra pages).
+   */
+  async function processPage(sourcePath, parentPath, slug, title, metaDescription = '') {
+    log(`Processing: ${sourcePath}`);
     try {
-      const html = await fetchPost(meta.path);
-      const post = parsePost(html, meta);
+      const html = await fetchPost(sourcePath);
+      const post = parsePost(html, { path: sourcePath, title, description: metaDescription });
+      // Override slug/title with explicitly provided values (extra pages)
+      post.slug = slug;
+      post.title = title || post.title;
 
       log(`  Title: ${post.title}`);
       log(`  Slug:  ${post.slug}`);
       log(`  Body:  ${post.bodyHtml.length} chars`);
 
       if (DRY_RUN) {
-        log(`  → [DRY RUN] Would create page at: ${PAGE_PARENT_PATH}/${post.slug}`);
+        log(`  → [DRY RUN] Would create page at: ${parentPath}/${post.slug}`);
         results.created.push(post.slug);
       } else {
-        const exists = await pageExists(`${PAGE_PARENT_PATH}/${post.slug}`);
+        const exists = await pageExists(`${parentPath}/${post.slug}`);
         if (exists) {
           log('  → Skipped (already exists)');
           results.skipped.push(post.slug);
         } else {
+          // Temporarily override parent path for createPage
+          const originalParent = PAGE_PARENT_PATH;
+          post._parentPath = parentPath;
           const pagePath = await createPage(post);
           log(`  → Created: ${pagePath}`);
           results.created.push(post.slug);
@@ -294,10 +313,21 @@ async function run() {
       }
     } catch (err) {
       log(`  → ERROR: ${err.message}`);
-      results.failed.push({ slug: slugify(meta.path), error: err.message });
+      results.failed.push({ slug, error: err.message });
     }
-
     log('');
+  }
+
+  // 3a. Migrate top-level pages (index, about, nav, footer) to site root
+  log('── Top-level pages ──────────────────────────────────');
+  for (const extra of EXTRA_PAGES) {
+    await processPage(extra.sourcePath, SITE_ROOT_PATH, extra.slug, extra.title);
+  }
+
+  // 3b. Migrate blog posts
+  log('── Blog posts ───────────────────────────────────────');
+  for (const meta of posts) {
+    await processPage(meta.path, PAGE_PARENT_PATH, slugify(meta.path), meta.title, meta.description);
   }
 
   // 4. Summary
