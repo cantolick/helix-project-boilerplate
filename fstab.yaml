@@ -1,2 +1,5 @@
 mountpoints:
-  /: https://drive.google.com/drive/folders/1-kDdRf8N7yPG649lNXldLgSuFDLFVHel
+  /:
+    url: "https://author-p110511-e1076828.adobeaemcloud.com/bin/franklin.delivery/cantolick/helix-project-boilerplate/main"
+    type: "markup"
+    suffix: ".html"

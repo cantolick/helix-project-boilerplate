@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-globals */
 // blocks/blog-feed/blog-feed.js
-// import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
+// import { fetchPlaceholders } from '../../scripts/aem.js';
 
 let blogData = [];
 // const currentPage = 0;
