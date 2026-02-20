@@ -25,7 +25,11 @@ const AEM_HOST = process.env.AEM_HOST || 'https://author-p110511-e1076828.adobea
 const AEM_TOKEN = process.env.AEM_TOKEN || '';
 
 // Where Content Fragments will be created in AEM DAM
+// Used for Sling POST servlet (full JCR path)
 const CF_PARENT_PATH = '/content/dam/helix-project-boilerplate/blog';
+
+// Assets API path — strips /content/dam prefix since the API adds it
+const CF_ASSETS_API_PATH = '/helix-project-boilerplate/blog';
 
 // The Content Fragment Model path in AEM
 // Update this after creating the model in AEM Author:
@@ -163,8 +167,8 @@ function aemHeaders() {
 /**
  * Check if a Content Fragment already exists at the given path.
  */
-async function cfExists(cfPath) {
-  const url = `${AEM_HOST}/api/assets${cfPath}.json`;
+async function cfExists(slug) {
+  const url = `${AEM_HOST}/api/assets${CF_ASSETS_API_PATH}/${slug}.json`;
   const res = await fetch(url, { headers: aemHeaders() });
   return res.ok;
 }
@@ -180,49 +184,30 @@ async function cfExists(cfPath) {
  */
 async function createContentFragment(post) {
   const cfPath = `${CF_PARENT_PATH}/${post.slug}`;
-  const url = `${AEM_HOST}/api/assets${CF_PARENT_PATH}/`;
+  const url = `${AEM_HOST}/api/assets${CF_ASSETS_API_PATH}/`;
 
   const payload = {
     class: 'asset',
     properties: {
+      name: post.slug,
       'jcr:title': post.title,
       'cq:model': CF_MODEL_PATH,
-      elements: {
-        title: {
-          ':type': 'string',
-          value: post.title,
-        },
-        date: {
-          ':type': 'calendar',
-          value: post.date,
-        },
-        description: {
-          ':type': 'string',
-          value: post.description,
-        },
-        category: {
-          ':type': 'string',
-          value: post.category,
-        },
-        tags: {
-          ':type': 'string[]',
-          value: post.tags,
-        },
-        body: {
-          ':type': 'text/html',
-          value: post.body,
-        },
-        image: {
-          ':type': 'string',
-          value: post.imageUrl,
-        },
-        sourcePath: {
-          ':type': 'string',
-          value: post.sourcePath,
-        },
-      },
+      contentFragment: true,
+      elements: [
+        { name: 'title', ':type': 'string', value: post.title },
+        { name: 'date', ':type': 'calendar', value: post.date },
+        { name: 'description', ':type': 'string', value: post.description },
+        { name: 'category', ':type': 'string', value: post.category },
+        { name: 'tags', ':type': 'string[]', value: post.tags },
+        { name: 'body', ':type': 'text/html', value: post.body },
+        { name: 'image', ':type': 'string', value: post.imageUrl },
+        { name: 'sourcePath', ':type': 'string', value: post.sourcePath },
+      ],
     },
   };
+
+  log(`  → Posting to: ${url}`);
+  log(`  → Payload: ${JSON.stringify({ ...payload, properties: { ...payload.properties, elements: '...' } })}`);
 
   const res = await fetch(url, {
     method: 'POST',
@@ -230,9 +215,16 @@ async function createContentFragment(post) {
     body: JSON.stringify(payload),
   });
 
+  const responseText = await res.text();
+
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`AEM API error ${res.status} for ${cfPath}: ${text}`);
+    // Try to extract a meaningful error from AEM's JSON error response
+    let detail = responseText.slice(0, 500);
+    try {
+      const json = JSON.parse(responseText);
+      detail = json.message || json.error?.message || detail;
+    } catch { /* not JSON */ }
+    throw new Error(`AEM API ${res.status} for ${cfPath}: ${detail}`);
   }
 
   return cfPath;
@@ -298,8 +290,18 @@ async function run() {
   // 1. Fetch index
   const posts = await fetchIndex();
 
-  // 2. Ensure parent folder exists (skip in dry run)
+  // 2. Verify AEM connectivity and token validity
   if (!DRY_RUN) {
+    log('Verifying AEM connectivity...');
+    const pingUrl = `${AEM_HOST}/api/assets.json`;
+    const pingRes = await fetch(pingUrl, { headers: aemHeaders() });
+    if (!pingRes.ok) {
+      log(`ERROR: AEM API returned ${pingRes.status} — check your AEM_TOKEN and AEM_HOST.`);
+      if (pingRes.status === 401) log('  Token may be expired. Get a new one from AEM Developer Console.');
+      process.exit(1);
+    }
+    log('  AEM connection OK.\n');
+
     await ensureFolder(CF_PARENT_PATH);
   }
 
@@ -328,7 +330,7 @@ async function run() {
         results.created.push(post.slug);
       } else {
         // Check if already exists
-        const exists = await cfExists(`${CF_PARENT_PATH}/${post.slug}`);
+        const exists = await cfExists(post.slug);
         if (exists) {
           log(`  → Skipped (already exists)`);
           results.skipped.push(post.slug);
