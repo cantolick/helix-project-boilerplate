@@ -1,6 +1,8 @@
 {
   "mappings": [
-    "/content/helix-project-boilerplate/:/"
+    "/content/helix-project-boilerplate/:/",
+    "/content/helix-project-boilerplate/configuration:/.helix/config.json",
+    "/content/helix-project-boilerplate/metadata:/metadata.json"
   ],
   "includes": [
     "/content/helix-project-boilerplate/"
