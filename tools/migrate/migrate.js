@@ -28,12 +28,7 @@ const AEM_TOKEN = process.env.AEM_TOKEN || '';
 // Used for Sling POST servlet (full JCR path)
 const CF_PARENT_PATH = '/content/dam/helix-project-boilerplate/blog';
 
-// Assets API path — strips /content/dam prefix since the API adds it
-const CF_ASSETS_API_PATH = '/helix-project-boilerplate/blog';
-
-// The Content Fragment Model path in AEM
-// Update this after creating the model in AEM Author:
-// Tools → Assets → Content Fragment Models → your model
+// The Content Fragment Model path in AEM (used for reference/docs)
 const CF_MODEL_PATH = '/conf/helix-project-boilerplate/settings/dam/cfm/models/blog-post';
 
 const DRY_RUN = process.argv.includes('--dry-run');
@@ -153,7 +148,10 @@ async function fetchPost(path) {
   return res.text();
 }
 
-// ─── AEM API ───────────────────────────────────────────────────────────────
+// ─── AEM Sites OpenAPI ─────────────────────────────────────────────────────
+
+// Model ID retrieved via GET /adobe/sites/cf/models
+const CF_MODEL_ID = 'L2NvbmYvaGVsaXgtcHJvamVjdC1ib2lsZXJwbGF0ZS9zZXR0aW5ncy9kYW0vY2ZtL21vZGVscy9ibG9nLXBvc3Q';
 
 function aemHeaders() {
   if (!AEM_TOKEN) throw new Error('AEM_TOKEN environment variable is required.');
@@ -165,49 +163,43 @@ function aemHeaders() {
 }
 
 /**
- * Check if a Content Fragment already exists at the given path.
+ * Check if a Content Fragment already exists by searching the Sites API.
  */
 async function cfExists(slug) {
-  const url = `${AEM_HOST}/api/assets${CF_ASSETS_API_PATH}/${slug}.json`;
+  const url = `${AEM_HOST}/adobe/sites/cf/fragments?path=${CF_PARENT_PATH}/${slug}`;
   const res = await fetch(url, { headers: aemHeaders() });
-  return res.ok;
+  if (!res.ok) return false;
+  const json = await res.json();
+  return json.total > 0;
 }
 
 /**
- * Create a Content Fragment in AEM via the Assets HTTP API.
+ * Create a Content Fragment via the AEM Sites Content Fragments OpenAPI.
  *
- * POST /api/assets/<parent-path>/
- * with the CF payload.
- *
- * AEM CF API reference:
- * https://experienceleague.adobe.com/docs/experience-manager-65/assets/extending/assets-api-content-fragments.html
+ * Field types per model introspection:
+ *   title, category, image, sourcePath → type: "text", values: [string]
+ *   description, body                  → type: "long-text", values: [string]
+ *   date                               → type: "date", values: [string ISO]
+ *   tags                               → type: "tag", values: [string[]]  (skipped — requires tag paths)
  */
 async function createContentFragment(post) {
   const cfPath = `${CF_PARENT_PATH}/${post.slug}`;
-  const url = `${AEM_HOST}/api/assets${CF_ASSETS_API_PATH}/`;
+  const url = `${AEM_HOST}/adobe/sites/cf/fragments`;
 
   const payload = {
-    class: 'asset',
-    properties: {
-      name: post.slug,
-      'jcr:title': post.title,
-      'cq:model': CF_MODEL_PATH,
-      contentFragment: true,
-      elements: [
-        { name: 'title', ':type': 'string', value: post.title },
-        { name: 'date', ':type': 'calendar', value: post.date },
-        { name: 'description', ':type': 'string', value: post.description },
-        { name: 'category', ':type': 'string', value: post.category },
-        { name: 'tags', ':type': 'string[]', value: post.tags },
-        { name: 'body', ':type': 'text/html', value: post.body },
-        { name: 'image', ':type': 'string', value: post.imageUrl },
-        { name: 'sourcePath', ':type': 'string', value: post.sourcePath },
-      ],
-    },
+    title: post.title,
+    parentPath: CF_PARENT_PATH,
+    modelId: CF_MODEL_ID,
+    fields: [
+      { name: 'title', type: 'text', multiple: false, values: [post.title] },
+      ...(post.date ? [{ name: 'date', type: 'date', multiple: false, values: [post.date] }] : []),
+      { name: 'description', type: 'long-text', multiple: false, values: [post.description] },
+      { name: 'category', type: 'text', multiple: false, values: [post.category] },
+      { name: 'body', type: 'long-text', multiple: false, values: [post.body] },
+      { name: 'image', type: 'text', multiple: false, values: [post.imageUrl] },
+      { name: 'sourcePath', type: 'text', multiple: false, values: [post.sourcePath] },
+    ],
   };
-
-  log(`  → Posting to: ${url}`);
-  log(`  → Payload: ${JSON.stringify({ ...payload, properties: { ...payload.properties, elements: '...' } })}`);
 
   const res = await fetch(url, {
     method: 'POST',
@@ -218,11 +210,10 @@ async function createContentFragment(post) {
   const responseText = await res.text();
 
   if (!res.ok) {
-    // Try to extract a meaningful error from AEM's JSON error response
     let detail = responseText.slice(0, 500);
     try {
       const json = JSON.parse(responseText);
-      detail = json.message || json.error?.message || detail;
+      detail = json.detail || JSON.stringify(json.validationStatus) || detail;
     } catch { /* not JSON */ }
     throw new Error(`AEM API ${res.status} for ${cfPath}: ${detail}`);
   }
