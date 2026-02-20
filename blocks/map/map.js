@@ -1,7 +1,7 @@
 // Franklin Block: Parks Map
 // File: /blocks/parks-map/parks-map.js
 
-import { loadCSS } from '../../scripts/lib-franklin.js';
+import { loadCSS } from '../../scripts/aem.js';
 
 // Global variables for the block
 let map;

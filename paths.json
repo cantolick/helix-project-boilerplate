@@ -1,0 +1,8 @@
+{
+  "mappings": [
+    "/content/helix-project-boilerplate/:/"
+  ],
+  "includes": [
+    "/content/helix-project-boilerplate/"
+  ]
+}
