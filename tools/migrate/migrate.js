@@ -46,6 +46,33 @@ function slugify(path) {
 }
 
 /**
+ * Parse a loose date string like "August 2025", "Feb 2019", "December 2024"
+ * into an ISO 8601 date string (YYYY-MM-DD) expected by the AEM Date field.
+ * Defaults to the 1st of the month when no day is present.
+ * Returns null if the string cannot be parsed.
+ */
+function parseDate(raw) {
+  if (!raw) return null;
+  const cleaned = raw.trim();
+
+  // Already ISO-ish: "2025-08-01"
+  if (/^\d{4}-\d{2}-\d{2}/.test(cleaned)) return cleaned.slice(0, 10);
+
+  // "Month YYYY" or "Mon YYYY" — e.g. "August 2025", "Feb 2019"
+  const monthYear = cleaned.match(/^([A-Za-z]+)\s+(\d{4})$/);
+  if (monthYear) {
+    const d = new Date(`${monthYear[1]} 1, ${monthYear[2]}`);
+    if (!Number.isNaN(d.getTime())) return d.toISOString().slice(0, 10);
+  }
+
+  // "Month Day, YYYY" — e.g. "February 14, 2018"
+  const full = new Date(cleaned);
+  if (!Number.isNaN(full.getTime())) return full.toISOString().slice(0, 10);
+
+  return null;
+}
+
+/**
  * Parse the .plain.html of a blog post into structured fields.
  * Structure observed:
  *   <div>
@@ -65,6 +92,7 @@ function parsePost(html, meta) {
   // Date — h4 element
   const dateEl = container.querySelector('h4');
   const dateRaw = dateEl ? dateEl.text.trim() : meta.lastModified;
+  const dateIso = parseDate(dateRaw);
 
   // Remove title and date elements so remaining content is the body
   if (titleEl) titleEl.remove();
@@ -87,7 +115,8 @@ function parsePost(html, meta) {
 
   return {
     title,
-    date: dateRaw,
+    date: dateIso,
+    dateRaw,
     description: meta.description || '',
     category: meta.category || '',
     tags: meta.tag ? meta.tag.split(',').map((t) => t.trim()).filter(Boolean) : [],
@@ -164,7 +193,7 @@ async function createContentFragment(post) {
           value: post.title,
         },
         date: {
-          ':type': 'string',
+          ':type': 'calendar',
           value: post.date,
         },
         description: {
@@ -211,24 +240,42 @@ async function createContentFragment(post) {
 
 /**
  * Ensure the parent folder exists in AEM DAM, create it if not.
+ * Uses the Sling POST servlet (multipart/form-data) which is the
+ * correct approach for AEM Cloud Service folder creation.
  */
 async function ensureFolder(folderPath) {
-  const url = `${AEM_HOST}/api/assets${folderPath}`;
-  const checkRes = await fetch(url, { headers: aemHeaders() });
+  // Check via Assets API if folder already exists
+  const checkUrl = `${AEM_HOST}/api/assets${folderPath}.json`;
+  const checkRes = await fetch(checkUrl, { headers: aemHeaders() });
   if (checkRes.ok) return;
 
   log(`  Creating DAM folder: ${folderPath}`);
-  const createRes = await fetch(url, {
-    method: 'POST',
-    headers: { ...aemHeaders(), 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      class: 'assetFolder',
-      properties: { 'jcr:title': 'Blog' },
-    }),
-  });
-  if (!createRes.ok) {
-    const text = await createRes.text();
-    throw new Error(`Failed to create folder ${folderPath}: ${createRes.status} ${text}`);
+
+  // Build each segment of the path, creating any missing folders top-down
+  const segments = folderPath.replace(/^\/content\/dam/, '').split('/').filter(Boolean);
+  let currentPath = '/content/dam';
+
+  for (const segment of segments) {
+    currentPath = `${currentPath}/${segment}`;
+    const segCheckRes = await fetch(`${AEM_HOST}/api/assets${currentPath.replace('/content/dam', '')}.json`, { headers: aemHeaders() });
+    if (segCheckRes.ok) continue;
+
+    // Use Sling POST servlet to create the folder node
+    const form = new FormData();
+    form.append('_charset_', 'utf-8');
+    form.append('./jcr:primaryType', 'sling:Folder');
+    form.append('./jcr:title', segment);
+
+    const createRes = await fetch(`${AEM_HOST}${currentPath}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${AEM_TOKEN}` },
+      body: form,
+    });
+
+    if (!createRes.ok && createRes.status !== 200 && createRes.status !== 201) {
+      const text = await createRes.text();
+      throw new Error(`Failed to create folder ${currentPath}: ${createRes.status} ${text.slice(0, 200)}`);
+    }
   }
 }
 
@@ -270,7 +317,7 @@ async function run() {
       const post = parsePost(html, meta);
 
       log(`  Title:    ${post.title}`);
-      log(`  Date:     ${post.date}`);
+      log(`  Date:     ${post.dateRaw} → ${post.date || 'COULD NOT PARSE'}`);
       log(`  Category: ${post.category}`);
       log(`  Tags:     ${post.tags.join(', ') || '(none)'}`);
       log(`  Image:    ${post.imageUrl || '(none)'}`);
