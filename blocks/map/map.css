@@ -138,6 +138,58 @@
 }
 
 /* Responsive design */
+@media (min-width: 769px) {
+  .parks-map-wrapper {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-areas:
+      'header header'
+      'stats stats'
+      'instructions instructions'
+      'map park-list'
+      'legend park-list'
+      'toggle park-list';
+  }
+
+  .parks-map-wrapper .header {
+    grid-area: header;
+  }
+
+  .parks-map-wrapper .stats {
+    grid-area: stats;
+  }
+
+  .parks-map-wrapper .instructions {
+    grid-area: instructions;
+  }
+
+  .parks-map-wrapper .parks-map-container {
+    grid-area: map;
+    width: 100%;
+    height: 600px;
+  }
+
+  .parks-map-wrapper .legend {
+    grid-area: legend;
+  }
+
+  .parks-map-wrapper .toggle-list {
+    grid-area: toggle;
+    display: none;
+  }
+
+  .parks-map-wrapper .park-list {
+    grid-area: park-list;
+    display: block !important;
+    max-height: 100vh;
+    height: auto;
+    overflow-y: auto;
+    border-top: 0;
+    border-left: 1px solid #e9ecef;
+    align-self: start;
+  }
+}
+
 @media (max-width: 768px) {
   .parks-map-wrapper .stats {
     flex-direction: column;
