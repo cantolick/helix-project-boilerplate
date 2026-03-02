@@ -192,12 +192,18 @@ function showError(container, error) {
 
 // Main block decoration function (Franklin style)
 export default async function decorate(block) {
+  const authoredTitle = block.querySelector('h1, h2, h3, h4, h5, h6')?.textContent?.trim();
+  const authoredDescription = block.querySelector('p')?.textContent?.trim();
+
+  const headerTitle = authoredTitle || '🏞️ Minnesota State Parks Visit Tracker';
+  const headerDescription = authoredDescription || "Green markers indicate parks you've visited, red markers for parks not yet visited";
+
   // Create the HTML structure
   block.innerHTML = `
     <div class="parks-map-wrapper">
       <div class="header">
-        <h1>🏞️ Minnesota State Parks Visit Tracker</h1>
-        <p>Green markers indicate parks you've visited, red markers for parks not yet visited</p>
+        <h1>${headerTitle}</h1>
+        <p>${headerDescription}</p>
       </div>
       
       <div class="stats">
