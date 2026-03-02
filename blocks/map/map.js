@@ -214,13 +214,7 @@ export default async function decorate(block) {
           <div class="stat-label">Completed</div>
         </div>
       </div>
-
-      <div class="instructions">
-        <strong>Minnesota State Parks:</strong> This map shows all Minnesota state parks with your visit status.
-      </div>
-
       <div class="parks-map-container" style="height: 600px; width: 100%;"></div>
-
       <div class="legend">
         <div class="legend-item">
           <div class="legend-color visited"></div>
@@ -237,7 +231,6 @@ export default async function decorate(block) {
       </div>
 
       <div class="park-list" id="parkList" style="display: none;">
-        <h3>All Minnesota State Parks</h3>
         <div id="parkItems"></div>
       </div>
     </div>
