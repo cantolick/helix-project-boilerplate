@@ -81,14 +81,6 @@
   background-color: #dc3545; 
 }
 
-.parks-map-wrapper .instructions {
-  background: #e3f2fd;
-  padding: 15px;
-  border-left: 4px solid #2196f3;
-  margin: 15px;
-  border-radius: 0 5px 5px 0;
-}
-
 .parks-map-wrapper .park-list {
   max-height: 300px;
   overflow-y: auto;
@@ -145,10 +137,8 @@
     grid-template-areas:
       'header header'
       'stats stats'
-      'instructions instructions'
       'map park-list'
-      'legend park-list'
-      'toggle park-list';
+      'legend park-list';
   }
 
   .parks-map-wrapper .header {
@@ -159,14 +149,8 @@
     grid-area: stats;
   }
 
-  .parks-map-wrapper .instructions {
-    grid-area: instructions;
-  }
-
   .parks-map-wrapper .parks-map-container {
     grid-area: map;
-    width: 100%;
-    height: 600px;
   }
 
   .parks-map-wrapper .legend {
@@ -174,7 +158,6 @@
   }
 
   .parks-map-wrapper .toggle-list {
-    grid-area: toggle;
     display: none;
   }
 
@@ -182,7 +165,6 @@
     grid-area: park-list;
     display: block !important;
     max-height: 100vh;
-    height: auto;
     overflow-y: auto;
     border-top: 0;
     border-left: 1px solid #e9ecef;
