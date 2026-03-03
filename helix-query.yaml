@@ -32,5 +32,5 @@ indices:
         select: 'meta[name="category"]'
         value: attribute(el, "content")
       tag:
-        selectFirst: 'meta[name="tag"], meta[name="tags"]'
+        select: 'meta[name="tag"], meta[name="tags"]'
         value: attribute(el, "content")
