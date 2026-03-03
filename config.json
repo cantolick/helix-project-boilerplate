@@ -1,5 +1,6 @@
 {
   "headers": [
+    { "path": "/query-index.json", "cache-control": "max-age=60, stale-while-revalidate=30" },
     { "path": "/**", "cache-control": "max-age=600" }
   ]
 }
