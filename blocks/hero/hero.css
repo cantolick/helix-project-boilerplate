@@ -42,6 +42,26 @@ main .hero h2 {
   margin: 0;
 }
 
+@media only screen and (min-width: 993px) {
+  main .hero {
+    height: 60vh;
+    min-height: 480px;
+    max-height: 650px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+
+  main .hero > div {
+    width: 100%;
+  }
+
+  main .hero > div > div {
+    padding-top: 0;
+  }
+}
+
 @media only screen and (max-width:992px) {
   main .hero  {
       height: auto;

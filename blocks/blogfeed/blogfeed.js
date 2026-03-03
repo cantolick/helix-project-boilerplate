@@ -1,28 +1,62 @@
 /* eslint-disable no-restricted-globals */
 // blocks/blog-feed/blog-feed.js
-// import { fetchPlaceholders } from '../../scripts/aem.js';
+import { readBlockConfig } from '../../scripts/aem.js';
 
 let blogData = [];
-// const currentPage = 0;
-// const itemsPerPage = 6;
-// const isLoading = false;
-let hasMoreContent = true;
+
+function getSectionConfig(block) {
+  const section = block.closest('.section');
+  if (!section?.dataset) {
+    return {};
+  }
+
+  return {
+    endpoint: section.dataset.endpoint,
+    dataEndpoint: section.dataset.dataEndpoint,
+    feed: section.dataset.feed,
+    source: section.dataset.source,
+    cacheVersion: section.dataset.cacheVersion,
+    version: section.dataset.version,
+    v: section.dataset.v,
+    layout: section.dataset.layout,
+  };
+}
+
+function resolveFeedConfig(block) {
+  const sectionConfig = getSectionConfig(block);
+  const blockConfig = readBlockConfig(block);
+  const config = { ...sectionConfig, ...blockConfig };
+
+  const endpoint = config.dataEndpoint || config.endpoint || config.feed || config.source || '/query-index.json';
+  const cacheVersion = config.cacheVersion || config.version || config.v || '';
+  const useCardLayout = (config.layout && `${config.layout}`.toLowerCase() === 'cards') || block.classList.contains('cards');
+
+  return { endpoint, cacheVersion, useCardLayout };
+}
+
+function buildEndpointUrl(endpoint, cacheVersion) {
+  const url = new URL(endpoint, window.location.origin);
+  if (cacheVersion) {
+    url.searchParams.set('v', cacheVersion);
+  }
+  return `${url.pathname}${url.search}`;
+}
+
 /**
  * Fetch blog data from query index
  */
-async function fetchBlogData() {
+async function fetchBlogData(endpoint, cacheVersion) {
   try {
-    const response = await fetch('/query-index.json');
+    const response = await fetch(buildEndpointUrl(endpoint, cacheVersion));
     if (!response.ok) throw new Error('Failed to fetch blog data');
 
     const result = await response.json();
     blogData = result.data || [];
 
-    // Sort by date (newest first) - date field is a Unix timestamp
+    // Sort by date (newest first)
     blogData.sort((a, b) => {
-      // Handle cases where date might be missing
-      const dateA = a.date || 0;
-      const dateB = b.date || 0;
+      const dateA = a.lastModified || a.date || 0;
+      const dateB = b.lastModified || b.date || 0;
 
       // Sort in descending order (newest first)
       return dateB - dateA;
@@ -181,24 +215,6 @@ function loadBlogPosts(container, loadingIndicator, useCardLayout = true) {
   });
 
   loadingIndicator.style.display = 'none';
-  hasMoreContent = false;
-}
-
-/**
- * Setup intersection observer for infinite scroll
- */
-function setupInfiniteScroll(container, loadingIndicator, useCardLayout) {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting && hasMoreContent) {
-        loadBlogPosts(container, loadingIndicator, useCardLayout);
-      }
-    });
-  }, {
-    rootMargin: '100px',
-  });
-
-  observer.observe(loadingIndicator);
 }
 
 /**
@@ -251,8 +267,10 @@ export default async function decorate(block) {
   // Add loading class
   block.classList.add('loading');
 
+  const feedConfig = resolveFeedConfig(block);
+
   // Check if this should use card layout or entry layout
-  const useCardLayout = block.classList.contains('cards') || (block.hasAttribute('data-layout') && block.getAttribute('data-layout') === 'cards');
+  const useCardLayout = feedConfig.useCardLayout;
 
   // Create container structure
   const containerClass = useCardLayout ? 'blog-feed-grid' : 'blog-feed-entries';
@@ -262,7 +280,7 @@ export default async function decorate(block) {
       <div class="blog-feed-posts ${containerClass}"></div>
       <div class="blog-feed-loading">
         <div class="loading-spinner"></div>
-        <p>Loading more posts...</p>
+        <p>Loading posts...</p>
       </div>
     </div>
   `;
@@ -272,7 +290,7 @@ export default async function decorate(block) {
 
   try {
     // Fetch blog data
-    await fetchBlogData();
+    await fetchBlogData(feedConfig.endpoint, feedConfig.cacheVersion);
 
     if (blogData.length === 0) {
       block.innerHTML = '<p class="no-posts">No blog posts found.</p>';
@@ -281,9 +299,6 @@ export default async function decorate(block) {
 
     // Load initial posts
     loadBlogPosts(container, loadingIndicator, useCardLayout);
-
-    // Setup infinite scroll
-    setupInfiniteScroll(container, loadingIndicator, useCardLayout);
 
     // Apply content enhancements after each load
     const observer = new MutationObserver(() => {

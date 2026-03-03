@@ -13,6 +13,6 @@ document.head.appendChild(latoFont);
 
 const fontAwesome = document.createElement('link');
 fontAwesome.rel = 'stylesheet';
-fontAwesome.href = 'styles/font-awesome.min.css';
+fontAwesome.href = '/styles/libs/font-awesome/css/font-awesome.min.css';
 fontAwesome.defer = true;
 document.head.appendChild(fontAwesome);
