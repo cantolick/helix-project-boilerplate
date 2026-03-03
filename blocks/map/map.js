@@ -1,12 +1,27 @@
 // Franklin Block: Parks Map
 // File: /blocks/parks-map/parks-map.js
 
-import { loadCSS } from '../../scripts/aem.js';
+import { loadCSS, readBlockConfig } from '../../scripts/aem.js';
 
 // Global variables for the block
 let map;
 let parks = [];
 const markers = [];
+
+const MARKER_COLORS = {
+  visited: '#2f7d32',
+  notVisited: '#66b3e1',
+};
+
+function parseVisitedValue(value) {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value === 1;
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    return ['true', '1', 'yes', 'y', 'visited'].includes(normalized);
+  }
+  return false;
+}
 
 // Load external dependencies
 async function loadDependencies() {
@@ -55,10 +70,48 @@ function initializeMap(container) {
   }, 100);
 }
 
+// Resolve authored parks data endpoint from block content
+function getAuthoredDataEndpoint(block, config = {}) {
+  const configuredEndpoint = config.dataEndpoint || config.endpoint || config.data;
+  if (configuredEndpoint) {
+    return Array.isArray(configuredEndpoint) ? configuredEndpoint[0] : configuredEndpoint;
+  }
+
+  const jsonLink = block.querySelector('a[href*=".json"]');
+  if (jsonLink?.href) {
+    return jsonLink.getAttribute('href');
+  }
+
+  const endpointText = [...block.querySelectorAll('p, li, div')]
+    .map((el) => el.textContent?.trim())
+    .find((text) => text && /\.json(\?|$)/i.test(text));
+
+  if (endpointText) {
+    return endpointText;
+  }
+
+  return 'parks.json';
+}
+
+function getSectionConfig(block) {
+  const section = block.closest('.section');
+  if (!section?.dataset) {
+    return {};
+  }
+
+  return {
+    title: section.dataset.title,
+    description: section.dataset.description,
+    dataEndpoint: section.dataset.dataEndpoint,
+    endpoint: section.dataset.endpoint,
+    data: section.dataset.data,
+  };
+}
+
 // Load parks data from JSON
-async function loadParks() {
+async function loadParks(dataEndpoint) {
   try {
-    const response = await fetch('parks.json');
+    const response = await fetch(dataEndpoint);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -67,7 +120,7 @@ async function loadParks() {
     // Convert string values to proper types
     parks = data.data.map((park) => ({
       ...park,
-      visited: park.visited === 'true',
+      visited: parseVisitedValue(park.visited),
       lat: parseFloat(park.lat),
       lng: parseFloat(park.lng),
     }));
@@ -86,7 +139,7 @@ function addMarkersToMap() {
     const lng = park.lng || (-94.6859 + (Math.random() - 0.5) * 6);
 
     // Set marker color based on visited status
-    const fillColor = park.visited ? '#28a745' : '#dc3545';
+    const fillColor = park.visited ? MARKER_COLORS.visited : MARKER_COLORS.notVisited;
 
     const marker = window.L.circleMarker([lat, lng], {
       radius: 8,
@@ -192,8 +245,19 @@ function showError(container, error) {
 
 // Main block decoration function (Franklin style)
 export default async function decorate(block) {
-  const authoredTitle = block.querySelector('h1, h2, h3, h4, h5, h6')?.textContent?.trim();
-  const authoredDescription = block.querySelector('p')?.textContent?.trim();
+  const sectionConfig = getSectionConfig(block);
+  const blockConfig = readBlockConfig(block);
+  const config = { ...sectionConfig, ...blockConfig };
+
+  const dataEndpoint = getAuthoredDataEndpoint(block, config);
+  const authoredTitle = (config.title && !Array.isArray(config.title)
+    ? config.title
+    : block.querySelector('h1, h2, h3, h4, h5, h6')?.textContent?.trim());
+  const authoredDescription = (config.description && !Array.isArray(config.description)
+    ? config.description
+    : [...block.querySelectorAll('p')]
+    .map((paragraph) => paragraph.textContent?.trim())
+    .find((text) => text && !/\.json(\?|$)/i.test(text)));
 
   const headerTitle = authoredTitle || '🏞️ Minnesota State Parks Visit Tracker';
   const headerDescription = authoredDescription || "Green markers indicate parks you've visited, red markers for parks not yet visited";
@@ -251,7 +315,7 @@ export default async function decorate(block) {
     await loadDependencies();
 
     // Load parks data
-    const dataLoaded = await loadParks();
+    const dataLoaded = await loadParks(dataEndpoint);
 
     if (!dataLoaded) {
       throw new Error('Failed to load parks data');

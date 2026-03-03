@@ -2,16 +2,24 @@
 /* File: /blocks/parks-map/parks-map.css */
 
 .parks-map-wrapper {
+  --mn-north-star: #003f87;
+  --mn-lake: #66b3e1;
+  --mn-pine: #2f7d32;
+  --mn-ice: #eaf6ff;
+  --mn-snow: #f8fbff;
+  --mn-text: #1f3347;
+  --mn-border: #c9dceb;
+
   max-width: 1200px;
   margin: 0 auto;
   background: white;
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0, 63, 135, 0.15);
   overflow: hidden;
 }
 
 .parks-map-wrapper .header {
-  background: linear-gradient(135deg, #2c5530, #4a7c59);
+  background: linear-gradient(135deg, var(--mn-north-star), var(--mn-lake));
   color: white;
   padding: 20px;
   text-align: center;
@@ -20,16 +28,16 @@
 .parks-map-wrapper .header h1 {
   margin: 0;
   font-size: 2em;
-  color:#d8effa;
+  color: var(--mn-ice);
 
 }
 
 .parks-map-wrapper .stats {
   display: flex;
   justify-content: space-around;
-  background: #f8f9fa;
+  background: var(--mn-snow);
   padding: 15px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--mn-border);
 }
 
 .parks-map-wrapper .stat {
@@ -39,11 +47,11 @@
 .parks-map-wrapper .stat-number {
   font-size: 2em;
   font-weight: bold;
-  color: #2c5530;
+  color: var(--mn-north-star);
 }
 
 .parks-map-wrapper .stat-label {
-  color: #666;
+  color: var(--mn-text);
   font-size: 0.9em;
 }
 
@@ -55,7 +63,7 @@
 .parks-map-wrapper .legend {
   background: white;
   padding: 15px;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--mn-border);
 }
 
 .parks-map-wrapper .legend-item {
@@ -70,22 +78,22 @@
   height: 20px;
   border-radius: 50%;
   margin-right: 8px;
-  border: 2px solid #333;
+  border: 2px solid var(--mn-text);
 }
 
 .parks-map-wrapper .legend-item .visited { 
-  background-color: #28a745; 
+  background-color: var(--mn-pine); 
 }
 
 .parks-map-wrapper .legend-item .not-visited { 
-  background-color: #dc3545; 
+  background-color: var(--mn-lake); 
 }
 
 .parks-map-wrapper .park-list {
   max-height: 300px;
   overflow-y: auto;
   padding: 15px;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--mn-border);
 }
 
 .parks-map-wrapper .park-item {
@@ -96,27 +104,27 @@
 }
 
 .parks-map-wrapper .park-item:hover {
-  background-color: #f8f9fa;
+  background-color: var(--mn-snow);
 }
 
 .parks-map-wrapper .park-item.visited {
-  background-color: #d4edda;
-  border-left: 4px solid #28a745;
+  background-color: #e3f4e5;
+  border-left: 4px solid var(--mn-pine);
 }
 
 .parks-map-wrapper .park-item.not-visited {
-  background-color: #f8d7da;
-  border-left: 4px solid #dc3545;
+  background-color: var(--mn-ice);
+  border-left: 4px solid var(--mn-lake);
 }
 
 .parks-map-wrapper .toggle-list {
   text-align: center;
   padding: 15px;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--mn-border);
 }
 
 .parks-map-wrapper .toggle-btn {
-  background: #007bff;
+  background: var(--mn-north-star);
   color: white;
   border: none;
   padding: 10px 20px;
@@ -126,7 +134,7 @@
 }
 
 .parks-map-wrapper .toggle-btn:hover {
-  background: #0056b3;
+  background: #002d63;
 }
 
 /* Responsive design */
@@ -167,7 +175,7 @@
     max-height: 100vh;
     overflow-y: auto;
     border-top: 0;
-    border-left: 1px solid #e9ecef;
+    border-left: 1px solid var(--mn-border);
     align-self: start;
   }
 }
@@ -180,7 +188,7 @@
   
   .parks-map-wrapper .header h1 {
     font-size: 1.5em;
-    color: #d8effa;
+    color: var(--mn-ice);
   }
   
   .parks-map-wrapper .parks-map-container {
