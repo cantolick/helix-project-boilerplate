@@ -141,7 +141,7 @@
 @media (min-width: 769px) {
   .parks-map-wrapper {
     display: grid;
-    grid-template-columns: 50% 50%;
+    grid-template-columns: 65% 35%;
     grid-template-areas:
       'header header'
       'stats stats'
@@ -159,6 +159,7 @@
 
   .parks-map-wrapper .parks-map-container {
     grid-area: map;
+    height: 650px;
   }
 
   .parks-map-wrapper .legend {
@@ -172,7 +173,7 @@
   .parks-map-wrapper .park-list {
     grid-area: park-list;
     display: block !important;
-    max-height: 100vh;
+    max-height: 710px;
     overflow-y: auto;
     border-top: 0;
     border-left: 1px solid var(--mn-border);

@@ -170,7 +170,7 @@ function addMarkersToMap() {
     }
 
     if (park.url) {
-      popupContent += `<p><a href="https://www.dnr.state.mn.us${park.url}" target="_blank" style="color: #007bff;">https://www.dnr.state.mn.us${park.url}</a></p>`;
+      popupContent += `<p><a href="https://www.dnr.state.mn.us${park.url}" target="_blank" aria-label="View park details for ${park.name} on the Minnesota DNR website" style="color: #007bff;">View Park Details</a></p>`;
     }
 
     popupContent += '</div>';
@@ -214,7 +214,7 @@ function createParkList(container) {
     }
 
     if (park.url) {
-      itemContent += `<br><small><a href="https://www.dnr.state.mn.us${park.url}" target="_blank" style="color: #007bff;">https://www.dnr.state.mn.us${park.url}</a></small>`;
+      itemContent += `<br><small><a href="https://www.dnr.state.mn.us${park.url}" target="_blank" aria-label="View park details for ${park.name} on the Minnesota DNR website" style="color: #007bff;">View Park Details</a></small>`;
     }
 
     item.innerHTML = itemContent;
@@ -284,7 +284,7 @@ export default async function decorate(block) {
           <div class="stat-label">Completed</div>
         </div>
       </div>
-      <div class="parks-map-container" style="height: 600px; width: 100%;"></div>
+      <div class="parks-map-container" style="height: 650px; width: 100%;"></div>
       <div class="legend">
         <div class="legend-item">
           <div class="legend-color visited"></div>
