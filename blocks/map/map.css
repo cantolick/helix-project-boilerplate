@@ -142,6 +142,7 @@
   .parks-map-wrapper {
     display: grid;
     grid-template-columns: 65% 35%;
+    grid-template-rows: auto auto 650px auto;
     grid-template-areas:
       'header header'
       'stats stats'
