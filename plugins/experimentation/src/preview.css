@@ -276,7 +276,7 @@
   .hlx-preview-overlay {
     flex-flow: row wrap-reverse;
     justify-content: flex-end;
-    font-size: 1.5rem;
+    font-size: 1rem;
   }
 
   .hlx-popup {
