@@ -151,15 +151,15 @@ async function isSidekickEnabled() {
   if (!sk) return false;
 
   return new Promise((resolve) => {
+    let timer;
     const interval = setInterval(() => {
       if (window.hlx?.sidekick) {
         clearInterval(interval);
-        clearTimeout(timeout);
+        clearTimeout(timer);
         resolve(true);
       }
     }, 50);
-    // eslint-disable-next-line vars-on-top, no-var
-    var timeout = setTimeout(() => {
+    timer = setTimeout(() => {
       clearInterval(interval);
       resolve(false);
     }, 2000);
@@ -220,10 +220,9 @@ async function loadLazy(doc) {
   if (getMetadata('experiment')
     || Object.keys(getAllMetadata('campaign')).length
     || Object.keys(getAllMetadata('audience')).length) {
-    if (await isSidekickEnabled()) {
-      const { loadLazy: runLazy } = await import('../plugins/experimentation/src/index.js');
-      await runLazy(document, { audiences: AUDIENCES }, pluginContext);
-    }
+    const sidekickEnabled = await isSidekickEnabled();
+    const { loadLazy: runLazy } = await import('../plugins/experimentation/src/index.js');
+    await runLazy(document, { audiences: AUDIENCES, isProd: () => !sidekickEnabled }, pluginContext);
   }
 }
 
