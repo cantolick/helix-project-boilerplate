@@ -139,6 +139,33 @@ const pluginContext = {
   toClassName,
 };
 
+async function isSidekickEnabled() {
+  // window.hlx.sidekick is only set by the actual AEM Sidekick extension.
+  // DOM element presence is NOT reliable — .aem.page auto-injects <aem-sidekick>
+  // for all visitors, which would cause false positives.
+  if (window.hlx?.sidekick) return true;
+
+  // The extension loads asynchronously, so if the element exists but the API
+  // isn't set yet, wait up to 2s for the extension to finish initializing.
+  const sk = document.querySelector('helix-sidekick, aem-sidekick');
+  if (!sk) return false;
+
+  return new Promise((resolve) => {
+    const interval = setInterval(() => {
+      if (window.hlx?.sidekick) {
+        clearInterval(interval);
+        clearTimeout(timeout);
+        resolve(true);
+      }
+    }, 50);
+    // eslint-disable-next-line vars-on-top, no-var
+    var timeout = setTimeout(() => {
+      clearInterval(interval);
+      resolve(false);
+    }, 2000);
+  });
+}
+
 /**
  * Loads everything needed to get to LCP.
  * @param {Element} doc The container element
@@ -193,8 +220,10 @@ async function loadLazy(doc) {
   if (getMetadata('experiment')
     || Object.keys(getAllMetadata('campaign')).length
     || Object.keys(getAllMetadata('audience')).length) {
-    const { loadLazy: runLazy } = await import('../plugins/experimentation/src/index.js');
-    await runLazy(document, { audiences: AUDIENCES }, pluginContext);
+    if (await isSidekickEnabled()) {
+      const { loadLazy: runLazy } = await import('../plugins/experimentation/src/index.js');
+      await runLazy(document, { audiences: AUDIENCES }, pluginContext);
+    }
   }
 }
 
