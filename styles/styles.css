@@ -42,7 +42,7 @@
 
 }
 
-@media (min-width: 900px) {
+@media (width >= 900px) {
   :root {
     --heading-font-size-xxl: 60px;
     --heading-font-size-xl: 48px;
@@ -225,13 +225,13 @@ main .section {
   padding: 64px 16px;
 }
 
-@media (min-width: 600px) {
+@media (width >= 600px) {
   main .section {
     padding: 64px 32px;
   }
 }
 
-@media (min-width: 900px) {
+@media (width >= 900px) {
   .section > div {
     max-width: 1200px;
     margin: auto;
@@ -241,4 +241,54 @@ main .section {
 /* section metadata */
 main .section.highlight {
   background-color: var(--highlight-background-color);
+}
+
+main .section.about .default-content-wrapper {
+  max-width: 900px;
+}
+
+main .section.about .default-content-wrapper > :first-child {
+  margin-top: 0;
+}
+
+main .section.skills {
+  padding: 50px 15px;
+  text-align: center;
+}
+
+main .section.skills .default-content-wrapper {
+  max-width: 900px;
+}
+
+main .section.skills .default-content-wrapper > :first-child {
+  margin-top: 0;
+}
+
+main .section.skills h1,
+main .section.skills h2,
+main .section.skills h3,
+main .section.skills h4,
+main .section.skills h5,
+main .section.skills h6 {
+  color: #374054;
+  margin-bottom: 50px;
+}
+
+main .section.skills ul {
+  display: block;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 800px;
+  list-style: none;
+  text-align: center;
+}
+
+main .section.skills li {
+  display: inline-block;
+  margin: 7px;
+  padding: 5px 10px;
+  color: #374054;
+  background: #e4e4ea;
+  cursor: default;
+  font-size: 1.2em;
 }
