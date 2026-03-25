@@ -11,6 +11,7 @@ function getSectionConfig(block) {
   }
 
   return {
+    path: section.dataset.path,
     endpoint: section.dataset.endpoint,
     dataEndpoint: section.dataset.dataEndpoint,
     feed: section.dataset.feed,
@@ -27,7 +28,7 @@ function resolveFeedConfig(block) {
   const blockConfig = readBlockConfig(block);
   const config = { ...sectionConfig, ...blockConfig };
 
-  const endpoint = config.dataEndpoint || config.endpoint || config.feed || config.source || '/query-index.json';
+  const endpoint = config.path || config.dataEndpoint || config.endpoint || config.feed || config.source || '/query-index.json';
   const cacheVersion = config.cacheVersion || config.version || config.v || '';
   const useCardLayout = (config.layout && `${config.layout}`.toLowerCase() === 'cards') || block.classList.contains('cards');
 

@@ -322,6 +322,12 @@ main .section.skills h6 {
   margin-bottom: 50px;
 }
 
+/* Sidekick library previews should not display library-metadata tables */
+.sidekick-library .library-metadata-wrapper,
+.sidekick-library .library-metadata.block {
+  display: none;
+}
+
 main .section.skills ul {
   display: block;
   margin: 0 auto;
