@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="AEM Sidekick Library">
+    <meta name="robots" content="noindex">
+    <base href="/">
+    <title>Sidekick Library</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background-color: #ededed;
+        font-family: sans-serif;
+      }
+
+      helix-sidekick,
+      aem-sidekick {
+        display: none;
+      }
+    </style>
+    <script type="module" src="https://www.aem.live/tools/sidekick/library/index.js"></script>
+  </head>
+  <body>
+    <script>
+      const library = document.createElement('sidekick-library');
+      library.config = {
+        base: '/tools/sidekick/library.json',
+      };
+
+      document.body.prepend(library);
+    </script>
+  </body>
+</html>
