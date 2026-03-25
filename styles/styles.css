@@ -269,6 +269,10 @@ main .section {
   padding: 64px 16px;
 }
 
+main .section .default-content-wrapper {
+  margin-bottom: 4rem;
+}
+
 @media (width >= 600px) {
   main .section {
     padding: 64px 32px;
