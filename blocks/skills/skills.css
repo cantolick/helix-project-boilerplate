@@ -5,7 +5,7 @@
 }
 
 h2.skills  {
-    color: #374054;
+    color: var(--brand-heading-color);
     margin-bottom: 50px
 }
 
@@ -20,8 +20,8 @@ h2.skills  {
     display: inline-block;
     margin: 7px;
     padding: 5px 10px;
-    color: #374054;
-    background: #e4e4ea;
+    color: var(--brand-heading-color);
+    background: var(--skill-pill-background-color);
     list-style: none;
     cursor: default;
     font-size: 1.2em

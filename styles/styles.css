@@ -12,12 +12,56 @@
 
  :root {
   /* colors */
-  --link-color: #035fe6;
-  --link-hover-color: #136ff6;
-  --background-color: #f2f2f5;
-  --overlay-background-color: #eee;
-  --highlight-background-color: #ccc;
-  --text-color: #000;
+  --link-color: #a35a2c;
+  --link-hover-color: #84441d;
+  --background-color: #f7f1e8;
+  --overlay-background-color: #ebe1d3;
+  --highlight-background-color: #dcc7a3;
+  --text-color: #16120f;
+  --text-inverse-color: #fcf8f2;
+  --brand-heading-color: #2f241d;
+  --text-muted-color: #6f6258;
+  --text-muted-alt-color: var(--text-muted-color);
+  --text-muted-soft-color: var(--text-muted-color);
+  --text-muted-strong-color: #584a3e;
+  --text-subtle-color: #92806f;
+  --text-faint-color: #ad9986;
+  --border-soft-color: #d6c8b8;
+  --border-light-color: #e0d4c4;
+  --border-muted-color: var(--border-light-color);
+  --surface-color: #fdf8f0;
+  --surface-secondary-color: #f4ebdf;
+  --surface-tertiary-color: #ede1d1;
+  --surface-spinner-color: #e5d7c3;
+  --surface-spinner-alt-color: #d7c2a6;
+  --skill-pill-background-color: #e7d8c3;
+  --entry-link-color: var(--link-color);
+  --experience-icon-background-color: #7f4a2a;
+  --hero-overlay-color: rgb(31 22 16 / 70%);
+  --hero-subheading-color: #d7b27b;
+  --blog-feed-title-color: var(--brand-heading-color);
+  --blog-feed-body-color: #43372d;
+  --blog-feed-link-color: var(--link-color);
+  --blog-feed-link-hover-color: var(--link-hover-color);
+  --blog-feed-error-color: #c74632;
+  --blog-feed-dark-link-color: #dfb37a;
+  --blog-feed-dark-description-color: #e7dac9;
+  --blog-feed-dark-meta-color: #c4af97;
+  --blog-feed-card-shadow-color: rgb(17 24 39 / 10%);
+  --blog-feed-card-shadow-strong-color: rgb(17 24 39 / 18%);
+  --blog-feed-card-shadow-dark-color: rgb(255 255 255 / 10%);
+  --blog-feed-card-shadow-dark-strong-color: rgb(255 255 255 / 16%);
+  --parks-map-north-star: #694231;
+  --parks-map-lake: #66b3e1;
+  --parks-map-river: #8b6141;
+  --parks-map-pine: #2f7d32;
+  --parks-map-ice: #eaf6ff;
+  --parks-map-snow: #fbf5eb;
+  --parks-map-text: #3e2f25;
+  --parks-map-border: #dbc9b2;
+  --parks-map-shadow-color: rgb(105 66 49 / 15%);
+  --parks-map-visited-background-color: #e3f4e5;
+  --parks-map-button-hover-color: #523122;
 
   /* fonts */
   --body-font-family: 'helvetica neue', helvetica, ubuntu, roboto, noto, sans-serif;
@@ -79,7 +123,7 @@ h4, h5, h6 {
   margin-top: 1em;
   margin-bottom: .5em;
   scroll-margin: calc(var(--nav-height) + 1em);
-  color: #374054;
+  color: var(--brand-heading-color);
 }
 
 h1 { font-size: var(--heading-font-size-xxl) }
@@ -144,7 +188,7 @@ a.button:any-link, button {
   font-style: normal;
   font-weight: 600;
   cursor: pointer;
-  color: var(--background-color);
+  color: var(--text-inverse-color);
   background-color: var(--link-color);
   margin: 16px 0;
   white-space: nowrap;
@@ -178,13 +222,13 @@ main input {
   padding: 0.75rem 0.6rem;
   border-radius: 0.25rem;
   box-sizing: border-box;
-  border: 1px solid var(--text-color);
+  border: 1px solid var(--border-light-color);
   color: var(--text-color);
-  background-color: var(--background-color);
+  background-color: var(--surface-color);
 }
 
 main input:hover {
-  border: 1px solid var(--text-color);
+  border: 1px solid var(--link-color);
 }
 
 main blockquote {
@@ -270,7 +314,7 @@ main .section.skills h3,
 main .section.skills h4,
 main .section.skills h5,
 main .section.skills h6 {
-  color: #374054;
+  color: var(--brand-heading-color);
   margin-bottom: 50px;
 }
 
@@ -287,8 +331,8 @@ main .section.skills li {
   display: inline-block;
   margin: 7px;
   padding: 5px 10px;
-  color: #374054;
-  background: #e4e4ea;
+  color: var(--brand-heading-color);
+  background: var(--skill-pill-background-color);
   cursor: default;
   font-size: 1.2em;
 }

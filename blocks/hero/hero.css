@@ -11,7 +11,7 @@ main .hero-container {
 main .hero {
   height: 100vh;
   position: relative;
-  background: rgba(20,76,125,0.8);
+  background: var(--hero-overlay-color);
   text-align: center;
   background-size: cover;
   padding: 15px;
@@ -35,7 +35,7 @@ main .hero h1 {
   margin-bottom: 0;
 }
 main .hero h2 {
-  color: #5ea7e5;
+  color: var(--hero-subheading-color);
   font-weight: 500;
   font-size: 2.25em;
   margin-bottom: 15px;

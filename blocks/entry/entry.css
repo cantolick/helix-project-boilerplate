@@ -1,11 +1,11 @@
 
 .entry {
     padding: 75px 15px;
-    border-bottom: 1px solid #dcd9d9
+    border-bottom: 1px solid var(--border-soft-color)
 }
 
 .entry h2 {
-    color: #374054
+    color: var(--brand-heading-color)
 }
 
 .entry .heading:after {
@@ -13,18 +13,18 @@
 }
 
 .entry p {
-    color: #6c7882;
+    color: var(--text-muted-alt-color);
     margin: 1.25em 0
 }
 
 .entry:nth-child(2n+3) {
-    background: #f2f2f5
+    background: var(--background-color)
 }
 
 .entry:nth-child(2n+3) p {
-    color: #434a50
+    color: var(--text-muted-strong-color)
 }
 
 .entry:nth-child(2n+3) a {
-    color: #266cab
+    color: var(--entry-link-color)
 }

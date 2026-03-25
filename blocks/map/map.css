@@ -3,20 +3,20 @@
 /* File: /blocks/parks-map/parks-map.css */
 
 .parks-map-wrapper {
-  --mn-north-star: #003f87;
-  --mn-lake: #66b3e1;
-  --mn-river: #0d5f86;
-  --mn-pine: #2f7d32;
-  --mn-ice: #eaf6ff;
-  --mn-snow: #f8fbff;
-  --mn-text: #1f3347;
-  --mn-border: #c9dceb;
+  --mn-north-star: var(--parks-map-north-star);
+  --mn-lake: var(--parks-map-lake);
+  --mn-river: var(--parks-map-river);
+  --mn-pine: var(--parks-map-pine);
+  --mn-ice: var(--parks-map-ice);
+  --mn-snow: var(--parks-map-snow);
+  --mn-text: var(--parks-map-text);
+  --mn-border: var(--parks-map-border);
 
   max-width: 1200px;
   margin: 0 auto;
   background: white;
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgb(0 63 135 / 15%);
+  box-shadow: 0 4px 6px var(--parks-map-shadow-color);
   overflow: hidden;
 }
 
@@ -124,7 +124,7 @@
 }
 
 .parks-map-wrapper .park-item.visited {
-  background-color: #e3f4e5;
+  background-color: var(--parks-map-visited-background-color);
   border-left: 4px solid var(--mn-pine);
 }
 
@@ -150,7 +150,7 @@
 }
 
 .parks-map-wrapper .toggle-btn:hover {
-  background: #002d63;
+  background: var(--parks-map-button-hover-color);
 }
 
 /* Responsive design */
