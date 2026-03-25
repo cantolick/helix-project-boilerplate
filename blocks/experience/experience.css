@@ -14,7 +14,7 @@
 
 .vtimeline-date {
   font-weight: 300;
-  color: #374054;
+  color: var(--brand-heading-color);
   flex-shrink: 0;
   /* Prevent shrinking */
 }
@@ -32,10 +32,10 @@
 
   .vtimeline-icon {
     position: relative;
-    color: #fff;
+    color: var(--text-inverse-color);
     width: 50px;
     height: 50px;
-    background: #1b67a9;
+    background: var(--experience-icon-background-color);
     border-radius: 50%;
     margin-left: 20px;
     /* Adjust margin as needed */
@@ -62,7 +62,7 @@
 .vtimeline-content h3 {
   font-size: 1.5em;
   font-weight: 300;
-  color: #374054;
+  color: var(--brand-heading-color);
   display: inline-block;
   margin: 0
 }
@@ -70,12 +70,12 @@
 .vtimeline-content h4 {
   font-size: 1.2em;
   font-weight: 300;
-  color: #6e7880;
+  color: var(--text-muted-soft-color);
   margin: 0 0 15px 0
 }
 
 .vtimeline-content p {
-  color: #6c7882;
+  color: var(--text-muted-alt-color);
   font-size: .9em;
   margin: 0
 }
@@ -83,8 +83,8 @@
 .vtimeline-content {
   margin-left: 1.3em;
   margin-bottom: .85em;
-  background: #fff;
-  border: 1px solid #e6e6e6;
+  background: var(--surface-color);
+  border: 1px solid var(--border-muted-color);
   padding: 15px;
   border-radius: 3px;
   text-align: left;
