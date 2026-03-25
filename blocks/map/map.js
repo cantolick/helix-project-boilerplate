@@ -7,6 +7,8 @@ const LEAFLET_CSS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/le
 const LEAFLET_JS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.js';
 const MAP_VIEWPORT_MARGIN = '300px 0px';
 const PARK_DETAILS_URL_BASE = 'https://www.dnr.state.mn.us';
+const PARK_LINK_COLOR = '#005a9c';
+const PARK_SECONDARY_TEXT_COLOR = '#505050';
 
 const MARKER_COLORS = {
   visited: '#2f7d32',
@@ -179,7 +181,7 @@ function addMarkersToMap(mapInstance, parksData) {
     }
 
     if (park.url) {
-      popupContent += `<p><a href="${PARK_DETAILS_URL_BASE}${park.url}" target="_blank" rel="noopener noreferrer" aria-label="View park details for ${park.name} on the Minnesota DNR website" style="color: #007bff;">View Park Details</a></p>`;
+      popupContent += `<p><a href="${PARK_DETAILS_URL_BASE}${park.url}" target="_blank" rel="noopener noreferrer" aria-label="View park details for ${park.name} on the Minnesota DNR website" style="color: ${PARK_LINK_COLOR};">View Park Details</a></p>`;
     }
 
     popupContent += '</div>';
@@ -218,11 +220,11 @@ function createParkList(container, parksData) {
     }
 
     if (park.notes) {
-      itemContent += `<br><strong>Notes: </strong><small style="color:rgba(68, 68, 68, 0.58); font-style: italic;">${park.notes}</small>`;
+      itemContent += `<br><strong>Notes: </strong><small style="color:${PARK_SECONDARY_TEXT_COLOR}; font-style: italic;">${park.notes}</small>`;
     }
 
     if (park.url) {
-      itemContent += `<br><small><a href="${PARK_DETAILS_URL_BASE}${park.url}" target="_blank" rel="noopener noreferrer" aria-label="View park details for ${park.name} on the Minnesota DNR website" style="color: #007bff;">View Park Details</a></small>`;
+      itemContent += `<br><small><a href="${PARK_DETAILS_URL_BASE}${park.url}" target="_blank" rel="noopener noreferrer" aria-label="View park details for ${park.name} on the Minnesota DNR website" style="color: ${PARK_LINK_COLOR};">View Park Details</a></small>`;
     }
 
     item.innerHTML = itemContent;
@@ -266,6 +268,20 @@ function waitForBlockVisibility(block) {
   });
 }
 
+// Show error message
+function showError(container, error) {
+  const mapDiv = container.querySelector('.parks-map-container');
+  mapDiv.innerHTML = `
+    <div style="display: flex; align-items: center; justify-content: center; height: 400px; background: #f8f9fa; color: #6c757d; text-align: center;">
+      <div>
+        <h3>Unable to load parks data</h3>
+        <p>Please ensure the parks.json file is available.</p>
+        <p><small>Error: ${error.message}</small></p>
+      </div>
+    </div>
+  `;
+}
+
 async function activateMapBlock(block, dataEndpoint) {
   try {
     await waitForBlockVisibility(block);
@@ -290,20 +306,6 @@ async function activateMapBlock(block, dataEndpoint) {
   }
 }
 
-// Show error message
-function showError(container, error) {
-  const mapDiv = container.querySelector('.parks-map-container');
-  mapDiv.innerHTML = `
-    <div style="display: flex; align-items: center; justify-content: center; height: 400px; background: #f8f9fa; color: #6c757d; text-align: center;">
-      <div>
-        <h3>Unable to load parks data</h3>
-        <p>Please ensure the parks.json file is available.</p>
-        <p><small>Error: ${error.message}</small></p>
-      </div>
-    </div>
-  `;
-}
-
 // Main block decoration function (Franklin style)
 export default async function decorate(block) {
   const sectionConfig = getSectionConfig(block);
@@ -317,8 +319,8 @@ export default async function decorate(block) {
   const authoredDescription = (config.description && !Array.isArray(config.description)
     ? config.description
     : [...block.querySelectorAll('p')]
-    .map((paragraph) => paragraph.textContent?.trim())
-    .find((text) => text && !/\.json(\?|$)/i.test(text)));
+      .map((paragraph) => paragraph.textContent?.trim())
+      .find((text) => text && !/\.json(\?|$)/i.test(text)));
 
   const headerTitle = authoredTitle || '🏞️ Minnesota State Parks Visit Tracker';
   const headerDescription = authoredDescription || "Green markers indicate parks you've visited, red markers for parks not yet visited";
@@ -382,5 +384,5 @@ export default async function decorate(block) {
     wrapper.toggleParkList();
   });
 
-  void activateMapBlock(block, dataEndpoint);
+  activateMapBlock(block, dataEndpoint);
 }
