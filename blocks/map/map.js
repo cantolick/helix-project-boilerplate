@@ -3,10 +3,10 @@
 
 import { loadCSS, readBlockConfig } from '../../scripts/aem.js';
 
-// Global variables for the block
-let map;
-let parks = [];
-const markers = [];
+const LEAFLET_CSS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.css';
+const LEAFLET_JS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.js';
+const MAP_VIEWPORT_MARGIN = '300px 0px';
+const PARK_DETAILS_URL_BASE = 'https://www.dnr.state.mn.us';
 
 const MARKER_COLORS = {
   visited: '#2f7d32',
@@ -25,28 +25,36 @@ function parseVisitedValue(value) {
 
 // Load external dependencies
 async function loadDependencies() {
-  // Load Leaflet CSS
-  await loadCSS('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.css');
-
-  // Load Leaflet JS
-  return new Promise((resolve, reject) => {
+  const cssPromise = loadCSS(LEAFLET_CSS_URL);
+  const scriptPromise = new Promise((resolve, reject) => {
     if (window.L) {
       resolve();
       return;
     }
 
+    const existingScript = document.querySelector(`script[src="${LEAFLET_JS_URL}"]`);
+    if (existingScript) {
+      existingScript.addEventListener('load', resolve, { once: true });
+      existingScript.addEventListener('error', reject, { once: true });
+      return;
+    }
+
     const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.js';
+    script.src = LEAFLET_JS_URL;
+    script.async = true;
     script.onload = resolve;
     script.onerror = reject;
     document.head.appendChild(script);
   });
+
+  await Promise.all([cssPromise, scriptPromise]);
 }
 
 // Initialize the map
 function initializeMap(container) {
   // Find the map div within the container
   const mapDiv = container.querySelector('.parks-map-container');
+  mapDiv.replaceChildren();
 
   // Ensure the container has proper dimensions before initializing
   if (mapDiv.offsetHeight === 0) {
@@ -54,7 +62,7 @@ function initializeMap(container) {
   }
 
   // Initialize the map centered on Minnesota with zoom limits
-  map = window.L.map(mapDiv, {
+  const mapInstance = window.L.map(mapDiv, {
     minZoom: 5, // Can't zoom out past this level
     maxZoom: 18, // Can't zoom in past this level
   }).setView([46.7296, -94.6859], 6);
@@ -62,12 +70,15 @@ function initializeMap(container) {
   // Add tile layer
   window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
-  }).addTo(map);
+  }).addTo(mapInstance);
 
-  // Force map to recognize its container size
-  setTimeout(() => {
-    map.invalidateSize();
-  }, 100);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      mapInstance.invalidateSize();
+    });
+  });
+
+  return mapInstance;
 }
 
 // Resolve authored parks data endpoint from block content
@@ -118,22 +129,20 @@ async function loadParks(dataEndpoint) {
     const data = await response.json();
 
     // Convert string values to proper types
-    parks = data.data.map((park) => ({
+    return data.data.map((park) => ({
       ...park,
       visited: parseVisitedValue(park.visited),
       lat: parseFloat(park.lat),
       lng: parseFloat(park.lng),
     }));
-
-    return true;
   } catch (error) {
-    return false;
+    return null;
   }
 }
 
 // Add markers to the map
-function addMarkersToMap() {
-  parks.forEach((park) => {
+function addMarkersToMap(mapInstance, parksData) {
+  parksData.forEach((park) => {
     // Use provided coordinates or estimate based on city
     const lat = park.lat || (46.7296 + (Math.random() - 0.5) * 4);
     const lng = park.lng || (-94.6859 + (Math.random() - 0.5) * 6);
@@ -148,7 +157,7 @@ function addMarkersToMap() {
       weight: 2,
       opacity: 1,
       fillOpacity: 0.8,
-    }).addTo(map);
+    }).addTo(mapInstance);
 
     // Build popup content with new fields
     let popupContent = `
@@ -170,20 +179,19 @@ function addMarkersToMap() {
     }
 
     if (park.url) {
-      popupContent += `<p><a href="https://www.dnr.state.mn.us${park.url}" target="_blank" aria-label="View park details for ${park.name} on the Minnesota DNR website" style="color: #007bff;">View Park Details</a></p>`;
+      popupContent += `<p><a href="${PARK_DETAILS_URL_BASE}${park.url}" target="_blank" rel="noopener noreferrer" aria-label="View park details for ${park.name} on the Minnesota DNR website" style="color: #007bff;">View Park Details</a></p>`;
     }
 
     popupContent += '</div>';
 
     marker.bindPopup(popupContent);
-    markers.push(marker);
   });
 }
 
 // Update statistics
-function updateStats(container) {
-  const visitedCount = parks.filter((park) => park.visited).length;
-  const totalCount = parks.length;
+function updateStats(container, parksData) {
+  const visitedCount = parksData.filter((park) => park.visited).length;
+  const totalCount = parksData.length;
   const percentage = totalCount > 0 ? Math.round((visitedCount / totalCount) * 100) : 0;
 
   container.querySelector('#visitedCount').textContent = visitedCount;
@@ -192,11 +200,11 @@ function updateStats(container) {
 }
 
 // Create park list
-function createParkList(container) {
+function createParkList(container, parksData) {
   const parkItems = container.querySelector('#parkItems');
   parkItems.innerHTML = '';
 
-  parks.forEach((park) => {
+  parksData.forEach((park) => {
     const item = document.createElement('div');
     item.className = park.visited ? 'park-item visited' : 'park-item not-visited';
 
@@ -214,7 +222,7 @@ function createParkList(container) {
     }
 
     if (park.url) {
-      itemContent += `<br><small><a href="https://www.dnr.state.mn.us${park.url}" target="_blank" aria-label="View park details for ${park.name} on the Minnesota DNR website" style="color: #007bff;">View Park Details</a></small>`;
+      itemContent += `<br><small><a href="${PARK_DETAILS_URL_BASE}${park.url}" target="_blank" rel="noopener noreferrer" aria-label="View park details for ${park.name} on the Minnesota DNR website" style="color: #007bff;">View Park Details</a></small>`;
     }
 
     item.innerHTML = itemContent;
@@ -227,6 +235,59 @@ function toggleParkList(container) {
   const parkList = container.querySelector('#parkList');
   const isVisible = parkList.style.display !== 'none';
   parkList.style.display = isVisible ? 'none' : 'block';
+  return !isVisible;
+}
+
+function updateToggleButton(button, isVisible) {
+  button.textContent = isVisible ? 'Hide Park List' : 'Show Park List';
+  button.setAttribute('aria-expanded', String(isVisible));
+}
+
+function waitForBlockVisibility(block) {
+  return new Promise((resolve) => {
+    if (!('IntersectionObserver' in window)) {
+      resolve();
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      const [entry] = entries;
+      if (!entry?.isIntersecting) {
+        return;
+      }
+
+      observer.disconnect();
+      resolve();
+    }, {
+      rootMargin: MAP_VIEWPORT_MARGIN,
+    });
+
+    observer.observe(block);
+  });
+}
+
+async function activateMapBlock(block, dataEndpoint) {
+  try {
+    await waitForBlockVisibility(block);
+
+    const [parksData] = await Promise.all([
+      loadParks(dataEndpoint),
+      loadDependencies(),
+    ]);
+
+    if (!parksData) {
+      throw new Error('Failed to load parks data');
+    }
+
+    requestAnimationFrame(() => {
+      const mapInstance = initializeMap(block);
+      addMarkersToMap(mapInstance, parksData);
+      createParkList(block, parksData);
+      updateStats(block, parksData);
+    });
+  } catch (error) {
+    showError(block, error);
+  }
 }
 
 // Show error message
@@ -284,7 +345,9 @@ export default async function decorate(block) {
           <div class="stat-label">Completed</div>
         </div>
       </div>
-      <div class="parks-map-container" style="height: 650px; width: 100%;"></div>
+      <div class="parks-map-container" aria-live="polite">
+        <div class="parks-map-placeholder">Interactive map loads when this section approaches the viewport.</div>
+      </div>
       <div class="legend">
         <div class="legend-item">
           <div class="legend-color visited"></div>
@@ -297,7 +360,7 @@ export default async function decorate(block) {
       </div>
 
       <div class="toggle-list">
-        <button class="toggle-btn" onclick="this.closest('.parks-map-wrapper').toggleParkList()">Show/Hide Park List</button>
+        <button class="toggle-btn" type="button" aria-expanded="false">Show Park List</button>
       </div>
 
       <div class="park-list" id="parkList" style="display: none;">
@@ -308,27 +371,16 @@ export default async function decorate(block) {
 
   // Add toggle function to the wrapper
   const wrapper = block.querySelector('.parks-map-wrapper');
-  wrapper.toggleParkList = () => toggleParkList(block);
+  const toggleButton = wrapper.querySelector('.toggle-btn');
 
-  try {
-    // Load dependencies
-    await loadDependencies();
+  wrapper.toggleParkList = () => {
+    const isVisible = toggleParkList(block);
+    updateToggleButton(toggleButton, isVisible);
+  };
 
-    // Load parks data
-    const dataLoaded = await loadParks(dataEndpoint);
+  toggleButton.addEventListener('click', () => {
+    wrapper.toggleParkList();
+  });
 
-    if (!dataLoaded) {
-      throw new Error('Failed to load parks data');
-    }
-
-    // Small delay to ensure DOM is ready, then initialize map
-    setTimeout(() => {
-      initializeMap(block);
-      addMarkersToMap();
-      createParkList(block);
-      updateStats(block);
-    }, 50);
-  } catch (error) {
-    showError(block, error);
-  }
+  void activateMapBlock(block, dataEndpoint);
 }

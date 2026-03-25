@@ -56,8 +56,19 @@
 }
 
 .parks-map-wrapper .parks-map-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: 600px;
   width: 100%;
+  background: linear-gradient(180deg, var(--mn-ice), white);
+}
+
+.parks-map-wrapper .parks-map-placeholder {
+  max-width: 28rem;
+  padding: 1rem 1.5rem;
+  color: var(--mn-text);
+  text-align: center;
 }
 
 .parks-map-wrapper .legend {
@@ -160,6 +171,7 @@
 
   .parks-map-wrapper .parks-map-container {
     grid-area: map;
+    display: block;
     height: 650px;
   }
 
@@ -194,6 +206,7 @@
   }
   
   .parks-map-wrapper .parks-map-container {
+    display: flex;
     height: 400px;
   }
   
