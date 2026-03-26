@@ -154,6 +154,40 @@
     ]
   },
   {
+    "id": "blogfeed",
+    "fields": [
+      {
+        "component": "text",
+        "name": "path",
+        "label": "Feed Path",
+        "valueType": "string",
+        "value": "/query-index.json"
+      },
+      {
+        "component": "text",
+        "name": "cacheVersion",
+        "label": "Cache Version",
+        "valueType": "string",
+        "value": ""
+      },
+      {
+        "component": "select",
+        "name": "layout",
+        "label": "Layout",
+        "options": [
+          {
+            "name": "Cards",
+            "value": "cards"
+          },
+          {
+            "name": "Entries",
+            "value": "entries"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "card",
     "fields": [
       {
@@ -192,6 +226,30 @@
     ]
   },
   {
+    "id": "entry",
+    "fields": [
+      {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Text",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "experience",
+    "fields": [
+      {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Text",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
     "id": "fragment",
     "fields": [
       {
@@ -218,6 +276,42 @@
         "label": "Alt",
         "value": ""
       },
+      {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Text",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "map",
+    "fields": [
+      {
+        "component": "text",
+        "name": "title",
+        "label": "Title",
+        "valueType": "string"
+      },
+      {
+        "component": "text",
+        "name": "description",
+        "label": "Description",
+        "valueType": "string"
+      },
+      {
+        "component": "text",
+        "name": "dataEndpoint",
+        "label": "Data Endpoint",
+        "valueType": "string",
+        "value": "parks.json"
+      }
+    ]
+  },
+  {
+    "id": "skills",
+    "fields": [
       {
         "component": "richtext",
         "name": "text",
