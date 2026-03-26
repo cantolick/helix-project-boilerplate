@@ -34,15 +34,15 @@ main .hero h1 {
   line-height: 0.9em;
   margin-bottom: 0;
 }
+
 main .hero h2 {
   color: var(--hero-subheading-color);
   font-weight: 500;
   font-size: 2.25em;
-  margin-bottom: 15px;
   margin: 0;
 }
 
-@media only screen and (min-width: 993px) {
+@media only screen and (width >= 993px) {
   main .hero {
     height: 60vh;
     min-height: 480px;
@@ -62,63 +62,59 @@ main .hero h2 {
   }
 }
 
-@media only screen and (max-width:992px) {
+@media only screen and (width <=992px) {
   main .hero  {
-      height: auto;
-      min-height: auto;
-      max-height: auto;
-      padding: 100px 15px
-  }
-
-  main .hero  {
-      position: relative;
-      transform: none;
-      left: auto;
-      top: auto
+  height: auto;
+  min-height: 0;
+  padding: 100px 15px;
+  position: relative;
+  transform: none;
+  left: auto;
+  top: auto;
   }
 
   main .hero h1 {
-      font-size: 3em
+  font-size: 3em;
   }
 
   main .hero h2 {
-      font-size: 1.75em
+  font-size: 1.75em;
   }
 }
-@media only screen and (max-width:480px) {
+
+@media only screen and (width <=480px) {
   main .hero h1 {
-      font-size: 1.5em
+  font-size: 1.5em;
   }
 
   main .hero h2 {
-      font-size: 1em
+  font-size: 1em;
   }
 
   main .hero a {
-      font-size: .9em;
-      padding: 5px 10px
+  font-size: 0.9em;
+  padding: 5px 10px;
   }
 }
-@media only screen and (max-width:768px) {
+
+@media only screen and (width <=768px) {
   main .hero h1 {
-      font-size: 2em
+  font-size: 2em;
   }
 
   main .hero h2 {
-      font-size: 1.3em
+  font-size: 1.3em;
   }
 
   main .hero a {
-      padding: 10px 20px
+  padding: 10px 20px;
   }
 }
+
 main .hero picture {
   position: absolute;
   z-index: -1;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
+  inset: 0;
   object-fit: cover;
   box-sizing: border-box;
 }

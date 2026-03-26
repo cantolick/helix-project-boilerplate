@@ -8,7 +8,7 @@
     color: var(--brand-heading-color)
 }
 
-.entry .heading:after {
+.entry .heading::after {
     background: 0 0
 }
 

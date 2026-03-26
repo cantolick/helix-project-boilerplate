@@ -74,7 +74,7 @@ function createPopupItem(item) {
     div.appendChild(description);
   }
 
- // Create performance placeholder for experiment variants
+  // Create performance placeholder for experiment variants
   const performance = document.createElement('p');
   performance.className = 'performance';
   div.appendChild(performance);
@@ -82,23 +82,23 @@ function createPopupItem(item) {
   if (typeof item === 'object' && item.actions && item.actions.length) {
     const actionsDiv = document.createElement('div');
     actionsDiv.className = 'hlx-popup-item-actions';
-    
+
     item.actions.forEach((action) => {
       const buttonDiv = document.createElement('div');
       buttonDiv.className = 'hlx-button';
-      
+
       const link = document.createElement('a');
       link.href = action.href || '#';
       link.textContent = action.label;
-      
+
       if (action.onclick) {
         link.addEventListener('click', action.onclick);
       }
-      
+
       buttonDiv.appendChild(link);
       actionsDiv.appendChild(buttonDiv);
     });
-    
+
     div.appendChild(actionsDiv);
   }
 
@@ -114,15 +114,15 @@ function createPopupItem(item) {
 function createPopupDialog(header, items = []) {
   const popup = document.createElement('div');
   popup.className = 'hlx-popup hlx-hidden';
-  
+
   const headerDiv = document.createElement('div');
   headerDiv.className = 'hlx-popup-header';
-  
+
   const headerLabel = document.createElement('h5');
   headerLabel.className = 'hlx-popup-header-label';
   headerLabel.textContent = typeof header === 'object' ? header.label : header;
   headerDiv.appendChild(headerLabel);
-  
+
   if (header.description) {
     const headerDescription = document.createElement('div');
     headerDescription.className = 'hlx-popup-header-description';
@@ -133,36 +133,36 @@ function createPopupDialog(header, items = []) {
     }
     headerDiv.appendChild(headerDescription);
   }
-  
+
   if (typeof header === 'object' && header.actions && header.actions.length) {
     const headerActions = document.createElement('div');
     headerActions.className = 'hlx-popup-header-actions';
-    
+
     header.actions.forEach((action) => {
       const buttonDiv = document.createElement('div');
       buttonDiv.className = 'hlx-button';
-      
+
       const link = document.createElement('a');
       link.href = action.href || '#';
       link.textContent = action.label;
-      
+
       if (action.onclick) {
         link.addEventListener('click', action.onclick);
       }
-      
+
       buttonDiv.appendChild(link);
       headerActions.appendChild(buttonDiv);
     });
-    
+
     headerDiv.appendChild(headerActions);
   }
-  
+
   popup.appendChild(headerDiv);
-  
+
   const itemsDiv = document.createElement('div');
   itemsDiv.className = 'hlx-popup-items';
   popup.appendChild(itemsDiv);
-  
+
   const list = popup.querySelector('.hlx-popup-items');
   items.forEach((item) => {
     list.append(createPopupItem(item));
@@ -357,7 +357,7 @@ function populatePerformanceMetrics(div, config, {
 }, conversionName = 'click') {
   const summary = div.querySelector('.hlx-info');
   summary.textContent = `Showing results for ${bigcountformat.format(totals.total_experimentations)} visits and ${bigcountformat.format(totals.total_conversions)} conversions: `;
-  
+
   if (totals.total_conversion_events < 500 && winner.p_value > 0.05) {
     summary.textContent += ` not yet enough data to determine a winner. Keep going until you get ${bigcountformat.format((500 * totals.total_experimentations) / totals.total_conversion_events)} visits.`;
   } else if (winner.p_value > 0.05) {
@@ -382,21 +382,21 @@ function populatePerformanceMetrics(div, config, {
 
   config.variantNames.forEach((variantName, index) => {
     const variantDiv = document.querySelector('aem-experimentation-bar')?.shadowRoot.querySelectorAll('.hlx-popup-item')[index];
-    const percentage = variantDiv.querySelector('.percentage'); 
+    const percentage = variantDiv.querySelector('.percentage');
     percentage.innerHTML = '';
-    
+
     const eventsSpan = document.createElement('span');
     eventsSpan.title = `${countformat.format(richVariants[variantName].variant_conversion_events)} real events`;
     eventsSpan.textContent = `${bigcountformat.format(richVariants[variantName].variant_conversions)} ${conversionName} events`;
-    percentage.appendChild(eventsSpan);  
+    percentage.appendChild(eventsSpan);
     percentage.appendChild(document.createTextNode(' / '));
-    
+
     const visitsSpan = document.createElement('span');
     visitsSpan.title = `${countformat.format(richVariants[variantName].variant_experimentation_events)} real events`;
     visitsSpan.textContent = `${bigcountformat.format(richVariants[variantName].variant_experimentations)} visits`;
-    percentage.appendChild(visitsSpan); 
+    percentage.appendChild(visitsSpan);
     percentage.appendChild(document.createTextNode(' '));
-    
+
     const splitSpan = document.createElement('span');
     splitSpan.textContent = `(${percentformat.format(richVariants[variantName].variant_experimentations / totals.total_experimentations)} split)`;
     percentage.appendChild(splitSpan);
@@ -405,19 +405,19 @@ function populatePerformanceMetrics(div, config, {
   variantsAsNums.forEach((result) => {
     const variant = document.querySelector('aem-experimentation-bar')?.shadowRoot.querySelectorAll('.hlx-popup-item')[config.variantNames.indexOf(result.variant)];
     if (variant) {
-      const performance = variant.querySelector('.performance'); 
+      const performance = variant.querySelector('.performance');
       performance.innerHTML = '';
-      
+
       const conversionSpan = document.createElement('span');
       conversionSpan.textContent = `${conversionName} conversion rate: ${percentformat.format(result.variant_conversion_rate)}`;
       performance.appendChild(conversionSpan);
       performance.appendChild(document.createTextNode(' '));
-      
+
       const vsSpan = document.createElement('span');
       vsSpan.textContent = `vs. ${percentformat.format(result.control_conversion_rate)}`;
-      performance.appendChild(vsSpan);  
+      performance.appendChild(vsSpan);
       performance.appendChild(document.createTextNode(' '));
-      
+
       const significanceSpan = document.createElement('span');
       significanceSpan.title = `p value: ${result.p_value}`;
       const significanceText = significanceformat.format(result.p_value);
@@ -556,7 +556,7 @@ async function decorateCampaignPill(overlay, options, context) {
     ? context.toClassName(usp.get(options.campaignsQueryParameter))
     : null)
     || (usp.has('utm_campaign') ? context.toClassName(usp.get('utm_campaign')) : null);
-  
+
   const campaignDescriptionContainer = document.createElement('div');
   const campaignDetailsDiv = document.createElement('div');
   campaignDetailsDiv.className = 'hlx-details';
@@ -568,7 +568,7 @@ async function decorateCampaignPill(overlay, options, context) {
   } else if (!audiences.length || !resolvedAudiences) {
     campaignDetailsDiv.textContent = 'No audience configured';
   }
-campaignDescriptionContainer.appendChild(campaignDetailsDiv);
+  campaignDescriptionContainer.appendChild(campaignDetailsDiv);
 
   const pill = createPopupButton(
     `Campaign: ${campaign || 'default'}`,
