@@ -7,8 +7,11 @@ indices:
     target: /query-index.json
     properties:
       date:
-        select: 'meta[name="date"]'
-        value: parseTimestamp(attribute(el, "content"), "MM/DD/YYYY")
+        selectFirst: 'meta[property="article:published_time"], meta[name="date"]'
+        value: |
+          attribute(el, "content") && attribute(el, "content").includes("T")
+            ? parseTimestamp(attribute(el, "content"))
+            : parseTimestamp(attribute(el, "content"), "MM/DD/YYYY")
       title:
         selectFirst: "main > div > h1, main h1, main h2"
         value: textContent(el)
@@ -23,8 +26,11 @@ indices:
         value: |
           words(textContent(el), 0, 20)
       image:
-        selectFirst: "main > div img, main img"
-        value: attribute(el, "src")
+        selectFirst: 'meta[name="image"], meta[property="og:image"], main > div img, main img'
+        value: attribute(el, "content") || attribute(el, "src")
+      author:
+        selectFirst: 'meta[name="author"], meta[property="article:author"]'
+        value: attribute(el, "content")
       path:
         selectFirst: "body"
         value: path

@@ -13,6 +13,22 @@ Before using the aem-boilerplate, we recommand you to go through the documentati
 3. [Web Performance](https://www.aem.live/developer/keeping-it-100)
 4. [Markup, Sections, Blocks, and Auto Blocking](https://www.aem.live/developer/markup-sections-blocks)
 
+## Article Metadata
+
+This project supports richer article metadata for AI-friendly previews and social cards through standard AEM EDS page metadata.
+
+- Author article metadata in the `page-metadata` model using `image`, `author`, `og:type`, `twitter:card`, `article:published_time`, `article:modified_time`, and `json-ld`.
+- Keep dates in ISO 8601 format, for example `2026-03-26T09:00:00-05:00`.
+- Prefer page-specific `image` values for article pages so previews do not fall back to the site default image.
+- Use `json-ld` for `Article`, `NewsArticle`, or `Product` schema when the page needs richer machine-readable context.
+- Blog pages inherit sane defaults from `metadata.json`, but page-level metadata still wins.
+
+Example `json-ld` value for an article:
+
+```json
+{"@context":"https://schema.org","@type":"Article","headline":"AI in VS Code helped me modernize a 3-year-old EDS fork in under 2 hours","description":"In April 2023, I forked the EDS boilerplate so I could ramp up on what Edge Delivery Services actually is.","author":{"@type":"Person","name":"Craig Antolick"},"image":["https://www.craigantolick.com/path/to/article-image.jpg"],"datePublished":"2026-03-26T09:00:00-05:00","dateModified":"2026-03-26T09:00:00-05:00","mainEntityOfPage":"https://www.craigantolick.com/blog/ai-vscode-eds-migration-post"}
+```
+
 ## Installation
 
 ```sh
