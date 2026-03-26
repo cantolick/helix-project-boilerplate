@@ -2,20 +2,17 @@
 <html>
 
 <head>
-  <meta
-    http-equiv="Content-Security-Policy"
-    content="script-src 'nonce-aem' 'strict-dynamic' 'unsafe-inline' http: https:; base-uri 'self'; object-src 'none';"
-    move-to-http-header="true"
-  >
   <title>Page not found</title>
-  <script nonce="aem" type="text/javascript">
+  <script type="text/javascript">
     window.isErrorPage = true;
     window.errorCode = '404';
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta property="og:title" content="Page not found">
-  <script nonce="aem" src="/scripts/scripts.js" type="module"></script>
-  <script nonce="aem" type="module">
+  <script src="/scripts/scripts.js" type="module" crossorigin="use-credentials"></script>
+  <script type="module">
+    import { sampleRUM } from '/scripts/aem.js';
+
     window.addEventListener('load', () => {
       if (document.referrer) {
         const { origin, pathname } = new URL(document.referrer);
@@ -29,11 +26,8 @@
           btnContainer.append(backBtn);
         }
       }
+      sampleRUM('404', { source: document.referrer, target: window.location.href });
     });
-  </script>
-  <script nonce="aem" type="module">
-    import { sampleRUM } from '/scripts/aem.js';
-    sampleRUM('404', { source: document.referrer });
   </script>
   <link rel="stylesheet" href="/styles/styles.css">
   <style>
@@ -48,7 +42,7 @@
     }
 
     main.error .error-number text {
-      font-family: monospace;
+      font-family: var(--fixed-font-family);
     }
   </style>
   <link rel="stylesheet" href="/styles/lazy-styles.css">
