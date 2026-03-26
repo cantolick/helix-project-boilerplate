@@ -27,7 +27,7 @@ export default function decorate(block) {
   // Example: Add classes or attributes to specific elements
   const headings = block.querySelectorAll('h2, h3, h4');
   headings.forEach((heading) => {
-        // Add a class to h2 elements
-        heading.classList.add('heading');
+    // Add a class to h2 elements
+    heading.classList.add('heading');
   });
 }

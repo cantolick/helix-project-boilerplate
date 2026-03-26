@@ -16,10 +16,11 @@
   font-weight: 300;
   color: var(--brand-heading-color);
   flex-shrink: 0;
+
   /* Prevent shrinking */
 }
 
-@media (min-width: 600px) {
+@media (width >= 600px) {
   .experience>ul>li {
     display: flex;
     align-items: flex-start;
@@ -38,8 +39,10 @@
     background: var(--experience-icon-background-color);
     border-radius: 50%;
     margin-left: 20px;
+
     /* Adjust margin as needed */
     flex-shrink: 0;
+
     /* Prevent shrinking */
     display: flex;
     justify-content: center;
@@ -53,10 +56,14 @@
 }
 
 .vtimeline-content {
+  margin-left: 1.3em;
+  margin-bottom: 0.85em;
+  background: var(--surface-color);
+  border: 1px solid var(--border-muted-color);
   padding: 15px;
+  border-radius: 3px;
   text-align: left;
   flex-grow: 1;
-  /* Allow to grow and fill remaining space */
 }
 
 .vtimeline-content h3 {
@@ -71,27 +78,17 @@
   font-size: 1.2em;
   font-weight: 300;
   color: var(--text-muted-soft-color);
-  margin: 0 0 15px 0
+  margin: 0 0 15px
 }
 
 .vtimeline-content p {
   color: var(--text-muted-alt-color);
-  font-size: .9em;
-  margin: 0
-}
-
-.vtimeline-content {
-  margin-left: 1.3em;
-  margin-bottom: .85em;
-  background: var(--surface-color);
-  border: 1px solid var(--border-muted-color);
-  padding: 15px;
-  border-radius: 3px;
-  text-align: left;
+  font-size: 0.9em;
+  margin: 0;
 }
 
 .fa {
-  font: normal normal normal 14px / 1 FontAwesome;
+  font: normal normal normal 14px / 1 FontAwesome, sans-serif;
   text-rendering: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

@@ -2,9 +2,14 @@
 coverage/*
 logs/*
 node_modules/*
+tools/migrate/.env
+tools/migrate/node_modules/
 
 helix-importer-ui
 .DS_Store
-.env
+*.bak
+.idea
 
-tools/migrate/node_modules/*
+# Ensure these files are tracked
+!CLAUDE.md
+!AGENTS.md

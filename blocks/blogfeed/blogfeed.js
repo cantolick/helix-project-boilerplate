@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-globals */
 // blocks/blog-feed/blog-feed.js
 import { readBlockConfig } from '../../scripts/aem.js';
 
@@ -65,7 +64,6 @@ async function fetchBlogData(endpoint, cacheVersion) {
 
     return blogData;
   } catch (error) {
-    console.error('Error fetching blog data:', error);
     return [];
   }
 }
@@ -77,7 +75,7 @@ function formatDate(dateString) {
 
   // Handle datetime attributes and various text formats
   const date = new Date(dateString);
-  if (isNaN(date.getTime())) {
+  if (Number.isNaN(date.getTime())) {
     // If it's just "Feb 2019" format, return as is
     return dateString;
   }
@@ -172,7 +170,7 @@ function createBlogEntry(item) {
   // Create datetime attribute if we have a valid date
   let datetimeAttr = '';
   const dateObj = new Date(item.lastModified);
-  if (!isNaN(dateObj.getTime())) {
+  if (!Number.isNaN(dateObj.getTime())) {
     datetimeAttr = `datetime="${dateObj.toISOString().split('T')[0]}"`;
   }
 
@@ -243,8 +241,7 @@ function enhanceContent(block) {
       const date = new Date(textContent);
 
       // Check if the parsed date is valid
-      // eslint-disable-next-line no-restricted-globals
-      if (!isNaN(date.getTime())) {
+      if (!Number.isNaN(date.getTime())) {
         // Format the date in ISO format for the datetime attribute
         const isoDate = date.toISOString().split('T')[0]; // Get only the date part
 
@@ -271,7 +268,7 @@ export default async function decorate(block) {
   const feedConfig = resolveFeedConfig(block);
 
   // Check if this should use card layout or entry layout
-  const useCardLayout = feedConfig.useCardLayout;
+  const { useCardLayout } = feedConfig;
 
   // Create container structure
   const containerClass = useCardLayout ? 'blog-feed-grid' : 'blog-feed-entries';
@@ -310,7 +307,6 @@ export default async function decorate(block) {
       childList: true,
     });
   } catch (error) {
-    console.error('Error setting up blog feed:', error);
     block.innerHTML = '<p class="error">Failed to load blog posts.</p>';
   } finally {
     block.classList.remove('loading');
