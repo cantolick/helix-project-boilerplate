@@ -1,0 +1,39 @@
+indices:
+  blog-index:
+    include:
+      - /blog/**
+    exclude:
+      - /api/**
+    target: /query-index.json
+    properties:
+      date:
+        select: 'meta[name="date"]'
+        value: parseTimestamp(attribute(el, "content"), "MM/DD/YYYY")
+      title:
+        selectFirst: "main > div > h1, main h1, main h2"
+        value: textContent(el)
+      lastModified:
+        selectFirst: "main time, main h4, main h3"
+        value: textContent(el)
+      description:
+        selectFirst: "main > div:nth-child(n+4) p, main p"
+        value: textContent(el)
+      content:
+        select: "main > div:nth-child(n+4) p, main p"
+        value: |
+          words(textContent(el), 0, 20)
+      image:
+        selectFirst: "main > div img, main img"
+        value: attribute(el, "src")
+      path:
+        selectFirst: "body"
+        value: path
+      category:
+        select: 'meta[name="category"]'
+        value: attribute(el, "content")
+      tag:
+        selectFirst: 'meta[name="tag"]'
+        value: attribute(el, "content")
+      tags:
+        select: 'meta[property="article:tag"]'
+        values: attribute(el, "content")

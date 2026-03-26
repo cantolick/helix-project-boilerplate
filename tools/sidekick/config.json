@@ -1,0 +1,5 @@
+{
+  "project": "Craig Antolick",
+  "editUrlLabel": "AEM Editor",
+  "editUrlPattern": "{{contentSourceUrl}}{{pathname}}?cmd=open"
+}

@@ -1,0 +1,15 @@
+{
+  "data": [
+    {
+      "path": "/",
+      "title": "Home",
+      "description": "Welcome to the site",
+      "robots": "index,follow"
+    },
+    {
+      "path": "/blog/**",
+      "title": "Blog",
+      "robots": "index,follow"
+    }
+  ]
+}
