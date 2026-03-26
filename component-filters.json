@@ -12,10 +12,15 @@
       "image",
       "button",
       "title",
+      "blogfeed",
+      "entry",
+      "experience",
       "hero",
       "cards",
       "columns",
-      "fragment"
+      "fragment",
+      "map",
+      "skills"
     ]
   },
   {
