@@ -32,6 +32,77 @@
         "name": "keywords",
         "multi": true,
         "label": "Keywords"
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Social Preview Image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "author",
+        "label": "Author",
+        "description": "Used for article metadata and structured data."
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "og:type",
+        "label": "Open Graph Type",
+        "options": [
+          {
+            "name": "Website",
+            "value": "website"
+          },
+          {
+            "name": "Article",
+            "value": "article"
+          },
+          {
+            "name": "Product",
+            "value": "product"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "twitter:card",
+        "label": "Twitter Card",
+        "options": [
+          {
+            "name": "Summary Large Image",
+            "value": "summary_large_image"
+          },
+          {
+            "name": "Summary",
+            "value": "summary"
+          }
+        ]
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "article:published_time",
+        "label": "Published Time",
+        "description": "ISO 8601 datetime for article previews, for example 2026-03-26T09:00:00-05:00."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "article:modified_time",
+        "label": "Modified Time",
+        "description": "ISO 8601 datetime for article previews, for example 2026-03-26T09:00:00-05:00."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "json-ld",
+        "label": "JSON-LD",
+        "description": "Paste compact JSON-LD for Article, NewsArticle, or Product schema."
       }
     ]
   },
