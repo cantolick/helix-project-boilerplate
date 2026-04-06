@@ -7,7 +7,7 @@ indices:
     target: /query-index.json
     properties:
       date:
-        selectFirst: 'meta[property="article:published_time"], meta[name="date"], main time'
+        selectFirst: 'meta[property="article:published_time"], meta[name="date"]'
         value: |
           attribute(el, "content")
             ? (
@@ -15,27 +15,32 @@ indices:
                 ? parseTimestamp(attribute(el, "content"))
                 : parseTimestamp(attribute(el, "content"), "MM/DD/YYYY")
             )
-            : (
-              attribute(el, "datetime")
-                ? parseTimestamp(attribute(el, "datetime"))
-                : parseTimestamp(textContent(el), "MMMM YYYY")
-            )
+            : ""
       title:
         selectFirst: "main > div > h1, main h1, main h2"
         value: textContent(el)
       lastModified:
         selectFirst: "main time, main h4, main h3, meta[property=\"article:published_time\"], meta[name=\"date\"]"
-        value: attribute(el, "content") || textContent(el)
+        value: |
+          attribute(el, "content")
+            ? attribute(el, "content")
+            : textContent(el)
       description:
         selectFirst: 'meta[name="description"], meta[property="og:description"], main > div:nth-child(n+4) p, main p'
-        value: attribute(el, "content") || textContent(el)
+        value: |
+          attribute(el, "content")
+            ? attribute(el, "content")
+            : textContent(el)
       content:
         select: "main > div:nth-child(n+4) p, main p"
         value: |
           words(textContent(el), 0, 20)
       image:
         selectFirst: 'meta[name="image"], meta[property="og:image"], main > div img, main img'
-        value: attribute(el, "content") || attribute(el, "src")
+        value: |
+          attribute(el, "content")
+            ? attribute(el, "content")
+            : attribute(el, "src")
       author:
         selectFirst: 'meta[name="author"], meta[property="article:author"]'
         value: attribute(el, "content")
