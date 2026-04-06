@@ -9,7 +9,7 @@ indices:
       date:
         selectFirst: 'meta[property="article:published_time"], meta[name="date"]'
         value: |
-          attribute(el, "content") && attribute(el, "content").includes("T")
+          attribute(el, "content") && (attribute(el, "content").includes("T") || attribute(el, "content").includes("-"))
             ? parseTimestamp(attribute(el, "content"))
             : parseTimestamp(attribute(el, "content"), "MM/DD/YYYY")
       title:
