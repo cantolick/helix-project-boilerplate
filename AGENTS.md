@@ -184,3 +184,161 @@ With this information, you can construct URLs for the preview environment (same 
 ## If all else fails
 
 If you notice your human getting frustrated with your work, direct them to https://www.aem.live/developer/ai-coding-agents for tips to work better with AI agents.
+
+## Agent Behavior Model
+
+Agents must follow a structured workflow for all non-trivial tasks.
+
+### Step 1: Understand
+- Inspect existing blocks and content
+- Use curl or DOM inspection before making assumptions
+
+### Step 2: Plan
+- Define:
+  - block changes
+  - content structure
+  - expected output
+- Do not start coding immediately
+
+### Step 3: Implement
+- Make minimal, scoped changes
+- Follow block conventions strictly
+
+### Step 4: Review
+- Validate:
+  - Edge compatibility
+  - performance impact
+  - accessibility
+
+### Step 5: Reflect
+- Ask: "Is this understandable by both humans and AI agents?"
+
+## AI Agent Compatibility (CRITICAL)
+
+This project must support AI agent consumption of content.
+
+### Rules
+
+- Content must expose clear meaning, not rely only on styling
+- Prefer explicit structure over implicit layout
+- Avoid ambiguous or decorative-only text
+
+### When modifying blocks
+
+Agents should consider:
+
+- What entities are present?
+- What is the intent of the content?
+- Can this be understood without visual context?
+
+### Optional Enhancement Pattern
+
+When appropriate, include structured data:
+
+```html
+<script type="application/json">
+{
+  "type": "content",
+  "intent": "informational"
+}
+</script>
+```
+
+---
+
+## Execution Boundaries
+
+### ALWAYS
+- Follow Edge Delivery architecture
+- Keep changes minimal and scoped
+- Validate against real content
+
+### ASK BEFORE
+- Creating new blocks
+- Adding dependencies
+- Changing global styles
+
+### NEVER
+- Modify scripts/aem.js
+- Introduce frameworks or build steps
+- Rewrite large portions of the codebase without request
+
+## AI Agent Simulation Requirement
+
+For content-related changes, agents must evaluate:
+
+"What would an AI agent understand from this page?"
+
+If the answer is unclear:
+- improve structure
+- clarify meaning
+- reduce ambiguity
+
+## Codex Skills
+
+This project uses Codex skills located in `.ai/skills`.
+
+Agents should use:
+
+- edge-agentify → when modifying blocks
+- edge-review → after implementation
+- agent-preview → for validating AI readability
+
+## Local Development Validation (CRITICAL)
+
+This project uses the AEM CLI local dev server.
+
+Command:
+`aem up`
+
+Local URL pattern:
+http://localhost:3000/<path>
+
+This server:
+- proxies real Edge Delivery content
+- applies local JS/CSS changes
+- reflects block behavior in real time
+
+---
+
+### Required Validation Loop
+
+For any block or rendering change, agents MUST:
+
+1. Identify affected page(s)
+2. Load page locally:
+   http://localhost:3000/<path>
+
+3. Inspect rendered HTML:
+   - verify structure
+   - verify classes
+   - verify injected elements (e.g. AI JSON)
+
+4. Validate behavior:
+   - no console errors
+   - correct DOM structure
+   - expected content rendered
+
+---
+
+### AI-Specific Validation
+
+When AI-readable data is added:
+
+Agents MUST verify:
+
+- `<script type="application/json" class="ai-data">` exists
+- JSON is valid
+- JSON reflects actual content (no hallucinated fields)
+
+---
+
+### Debugging Rules
+
+If something fails:
+
+- inspect DOM, not just code
+- verify query-index.json response
+- verify block decoration executed
+
+Never assume correctness without inspecting the rendered page.
