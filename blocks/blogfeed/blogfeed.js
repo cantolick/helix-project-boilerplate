@@ -3,6 +3,17 @@ import { readBlockConfig } from '../../scripts/aem.js';
 
 let blogData = [];
 
+function getDateSource(item) {
+  return item.date || item.lastModified || '';
+}
+
+function getDateTimestamp(value) {
+  if (!value) return 0;
+
+  const timestamp = new Date(value).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
 function getSectionConfig(block) {
   const section = block.closest('.section');
   if (!section?.dataset) {
@@ -55,8 +66,8 @@ async function fetchBlogData(endpoint, cacheVersion) {
 
     // Sort by date (newest first)
     blogData.sort((a, b) => {
-      const dateA = a.lastModified || a.date || 0;
-      const dateB = b.lastModified || b.date || 0;
+      const dateA = getDateTimestamp(getDateSource(a));
+      const dateB = getDateTimestamp(getDateSource(b));
 
       // Sort in descending order (newest first)
       return dateB - dateA;
@@ -115,7 +126,7 @@ function createBlogCard(item) {
 
   const title = item.title || 'Untitled';
   const description = item.description || extractDescription(item.content) || '';
-  const date = formatDate(item.lastModified);
+  const date = formatDate(getDateSource(item));
   const author = item.author || '';
   const path = item.path || '#';
   const { image } = item;
@@ -159,7 +170,7 @@ function createBlogEntry(item) {
 
   const title = item.title || 'Untitled';
   const description = item.description || extractDescription(item.content) || '';
-  const date = formatDate(item.lastModified);
+  const date = formatDate(getDateSource(item));
   const author = item.author || '';
   const path = item.path || '#';
   const { image } = item;
@@ -169,7 +180,7 @@ function createBlogEntry(item) {
 
   // Create datetime attribute if we have a valid date
   let datetimeAttr = '';
-  const dateObj = new Date(item.lastModified);
+  const dateObj = new Date(getDateSource(item));
   if (!Number.isNaN(dateObj.getTime())) {
     datetimeAttr = `datetime="${dateObj.toISOString().split('T')[0]}"`;
   }
