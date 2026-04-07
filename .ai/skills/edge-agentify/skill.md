@@ -1,50 +1,65 @@
+---
+name: edge-agentify
+description: Use when modifying Edge Delivery Services blocks, templates, indexing, metadata, or authored content structures in this repo. Read Adobe's llms.txt and aem.live docs first, then inspect local markup and implement the smallest EDS-compatible change.
+---
+
 # Edge Agentify
 
-Convert Edge Delivery blocks into AI-readable structures.
+This skill is for Adobe Edge Delivery Services work in this repository.
 
-## Steps
-1. Identify block purpose
-2. Extract:
-   - entity
-   - intent
-   - key fields
-3. Inject JSON into DOM using <script type="application/json">
+## Use This Skill When
 
-## Rules
-- Do not duplicate DOM
-- Keep JSON minimal
-- Map directly from content
+- Editing block JavaScript or CSS
+- Changing content structure, metadata, or indexing
+- Adding AI-readable content structures
+- Debugging unexpected EDS markup or authored content shape
 
-## Output
-- Updated block code
-- AI JSON structure
+## Source Of Truth
 
-# Edge Review
+For EDS questions, prefer Adobe sources before coding:
 
-Review implementation across:
+1. Read `https://www.aem.live/llms.txt`
+2. Search only `www.aem.live` unless the user asks otherwise
+3. Prefer these docs first:
+   - `https://www.aem.live/developer/tutorial`
+   - `https://www.aem.live/developer/anatomy-of-a-project`
+   - `https://www.aem.live/developer/markup-sections-blocks`
+   - `https://www.aem.live/developer/indexing`
+   - `https://www.aem.live/developer/keeping-it-100`
+   - `https://www.aem.live/docs/dev-collab-and-good-practices`
+   - `https://www.aem.live/developer/ai-coding-agents`
 
-1. AEM architecture
-2. Performance
-3. SEO / GEO
-4. AI readability
+## EDS Guardrails
 
-## Output
-- Issues
-- Improvements
-- Readiness score
+- Treat this as Edge Delivery Services, not classic AEM
+- Do not invent Sling, JCR, OSGi, HTL, or server-side patterns
+- Inspect delivered HTML before changing block assumptions
+- Keep changes small, block-scoped, and author-friendly
+- Prefer semantic HTML and explicit content structure over decorative structure
 
-# Agent Preview
+## Workflow
 
-Simulate how an AI agent interprets content.
+1. Read the relevant Adobe doc pages for the task
+2. Inspect the local implementation:
+   - block files
+   - `scripts/scripts.js`
+   - `helix-query.yaml` or metadata files when relevant
+3. Inspect real content shape before coding:
+   - `curl http://localhost:3000/<path>`
+   - `curl http://localhost:3000/<path>.plain.html`
+   - `curl http://localhost:3000/<path>.md`
+4. Define the authored content contract in plain language
+5. Implement the smallest change that fits that contract
+6. Validate with the local dev server and query/index output when relevant
 
-## Steps
-1. Extract all .ai-data JSON
-2. Summarize:
-   - entities
-   - intent
-3. Identify ambiguity
+## For AI-Readable Enhancements
 
-## Output
-- Agent understanding
-- Gaps
-- Suggested improvements
+- Only add machine-readable JSON when it reflects visible content
+- Keep JSON minimal and derived from the page, not inferred
+- Prefer content clarity in the HTML itself before adding JSON helpers
+
+## Output Expectations
+
+- Cite which Adobe doc or pattern informed the change
+- State what authored structure the block now expects
+- State how the change was validated locally
