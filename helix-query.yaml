@@ -7,15 +7,11 @@ indices:
     target: /query-index.json
     properties:
       date:
-        selectFirst: 'meta[property="article:published_time"], meta[name="date"]'
-        value: |
-          attribute(el, "content") && attribute(el, "content").includes("T")
-            ? parseTimestamp(attribute(el, "content"))
-            : (
-              attribute(el, "content") && attribute(el, "content").includes("-")
-                ? parseTimestamp(attribute(el, "content"), "YYYY-MM-DD")
-                : parseTimestamp(attribute(el, "content"), "MM/DD/YYYY")
-            )
+        select: 'head meta[name="date"]'
+        value: dateValue(attribute(el, "content"), "YYYY-MM-DD")
+      lastModifiedDate:
+        select: 'head meta[name="date"]'
+        value: attribute(el, "content")
       title:
         selectFirst: "main > div > h1, main h1, main h2"
         value: textContent(el)
@@ -23,26 +19,20 @@ indices:
         selectFirst: "main time, main h4, main h3"
         value: textContent(el)
       description:
-        selectFirst: "main > div:nth-child(n+4) p, main p"
-        value: textContent(el)
-      content:
-        select: "main > div:nth-child(n+4) p, main p"
-        value: |
-          words(textContent(el), 0, 20)
-      image:
-        selectFirst: 'meta[name="image"], meta[property="og:image"], main > div img, main img'
-        value: attribute(el, "content") || attribute(el, "src")
-      author:
-        selectFirst: 'meta[name="author"], meta[property="article:author"]'
+        # from metadata / SEO description, which should be driven by your metadata table
+        select: 'head meta[name="description"]'
         value: attribute(el, "content")
+      content:
+        selectFirst: "main > div:nth-child(4), main > div:nth-child(3), main"
+        value: textContent(el)
+      image:
+        selectFirst: 'head meta[property="og:image"], main img'
+        value: attribute(el, "content") || attribute(el, "src")
       path:
         selectFirst: "body"
         value: path
       category:
         select: 'meta[name="category"]'
-        value: attribute(el, "content")
-      tag:
-        selectFirst: 'meta[name="tag"]'
         value: attribute(el, "content")
       tags:
         select: 'meta[property="article:tag"]'
