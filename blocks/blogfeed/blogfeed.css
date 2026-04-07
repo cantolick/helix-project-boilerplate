@@ -2,6 +2,8 @@
 
 .blog-feed {
   margin: 2rem 0;
+
+  --blog-feed-type-scale: 0.7;
 }
 
 .blog-feed.loading {
@@ -34,7 +36,7 @@
 /* Main heading styling to match your site */
 .blog-entry h2.main-heading {
   margin: 0 0 0.5rem;
-  font-size: 2rem; /* Slightly larger for hierarchy */
+  font-size: calc(2rem * var(--blog-feed-type-scale)); /* Slightly larger for hierarchy */
   line-height: 1.3;
   color: var(--blog-feed-title-color); /* Dark text like your site */
   font-family: inherit; /* Use your site's font */
@@ -55,7 +57,7 @@
   display: block;
   margin-bottom: 1.5rem;
   color: var(--text-muted-color);
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--blog-feed-type-scale));
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -66,7 +68,7 @@
   margin: 1.5rem 0;
   line-height: 1.6;
   color: var(--blog-feed-body-color);
-  font-size: 1rem;
+  font-size: calc(1rem * var(--blog-feed-type-scale));
   font-weight: 400;
 }
 
@@ -87,7 +89,7 @@
   color: var(--blog-feed-link-color);
   text-decoration: none;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: calc(0.9rem * var(--blog-feed-type-scale));
   margin-top: 1.5rem;
   transition: all 0.2s ease;
   text-transform: uppercase;
@@ -103,7 +105,7 @@
 .blog-entry .author-info {
   margin-top: 1.5rem;
   color: var(--text-muted-color);
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--blog-feed-type-scale));
   font-style: italic;
 }
 
@@ -130,7 +132,7 @@
   }
   
   .blog-entry h2.main-heading {
-    font-size: 1.5rem;
+    font-size: calc(1.5rem * var(--blog-feed-type-scale));
   }
 }
 
@@ -177,7 +179,7 @@
 
 .blog-card-header h2 {
   margin: 0 0 0.5rem;
-  font-size: 1.25rem;
+  font-size: calc(1.25rem * var(--blog-feed-type-scale));
   font-weight: 600;
   line-height: 1.3;
 }
@@ -193,7 +195,7 @@
 }
 
 .blog-card-header time {
-  font-size: 0.8rem;
+  font-size: calc(0.8rem * var(--blog-feed-type-scale));
   color: var(--text-muted-color);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -218,7 +220,7 @@
   color: var(--blog-feed-link-color);
   text-decoration: none;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: calc(0.9rem * var(--blog-feed-type-scale));
   transition: gap 0.2s ease;
   margin-top: auto;
   text-transform: uppercase;
