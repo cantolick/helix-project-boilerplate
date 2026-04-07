@@ -7,14 +7,14 @@ indices:
     target: /query-index.json
     properties:
       date:
-        selectFirst: 'meta[property="article:published_time"], meta[name="date"]'
+        selectFirst: 'head > meta[property="article:published_time"], head > meta[name="date"]'
         value: |
           attribute(el, "content") && attribute(el, "content").includes("T")
-            ? parseTimestamp(attribute(el, "content"))
+            ? dateValue(characters(attribute(el, "content"), 0, 10), "YYYY-MM-DD")
             : (
               attribute(el, "content") && attribute(el, "content").includes("-")
-                ? parseTimestamp(attribute(el, "content"), "YYYY-MM-DD")
-                : parseTimestamp(attribute(el, "content"), "MM/DD/YYYY")
+                ? dateValue(attribute(el, "content"), "YYYY-MM-DD")
+                : dateValue(attribute(el, "content"), "MM/DD/YYYY")
             )
       title:
         selectFirst: "main > div > h1, main h1, main h2"
