@@ -13,6 +13,7 @@
     },
     {
       "path": "/blog/*",
+      "template": "blog-post",
       "og:type": "article",
       "twitter:card": "summary_large_image",
       "author": "Craig Antolick",
