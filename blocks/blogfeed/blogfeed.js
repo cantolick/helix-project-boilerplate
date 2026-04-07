@@ -7,6 +7,10 @@ function getDateSource(item) {
   return item.date || item.lastModified || '';
 }
 
+function getDisplayDateSource(item) {
+  return item.lastModified || item.date || '';
+}
+
 function getDateTimestamp(value) {
   if (!value) return 0;
 
@@ -126,7 +130,7 @@ function createBlogCard(item) {
 
   const title = item.title || 'Untitled';
   const description = item.description || extractDescription(item.content) || '';
-  const date = formatDate(getDateSource(item));
+  const date = formatDate(getDisplayDateSource(item));
   const author = item.author || '';
   const path = item.path || '#';
   const { image } = item;
@@ -170,7 +174,7 @@ function createBlogEntry(item) {
 
   const title = item.title || 'Untitled';
   const description = item.description || extractDescription(item.content) || '';
-  const date = formatDate(getDateSource(item));
+  const date = formatDate(getDisplayDateSource(item));
   const author = item.author || '';
   const path = item.path || '#';
   const { image } = item;
@@ -180,7 +184,7 @@ function createBlogEntry(item) {
 
   // Create datetime attribute if we have a valid date
   let datetimeAttr = '';
-  const dateObj = new Date(getDateSource(item));
+  const dateObj = new Date(getDisplayDateSource(item));
   if (!Number.isNaN(dateObj.getTime())) {
     datetimeAttr = `datetime="${dateObj.toISOString().split('T')[0]}"`;
   }
