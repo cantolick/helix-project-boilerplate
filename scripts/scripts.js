@@ -120,6 +120,20 @@ function buildHeroBlock(main) {
   }
 }
 
+function buildRelatedPostsBlock(main) {
+  if (!document.body.classList.contains('blog-post') || main.querySelector('.related-posts')) {
+    return;
+  }
+
+  const section = document.createElement('div');
+  section.classList.add('blog-sidebar');
+  section.append(buildBlock('related-posts', [
+    ['Heading', 'Related posts'],
+    ['Limit', '3'],
+  ]));
+  main.append(section);
+}
+
 /**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
@@ -127,6 +141,7 @@ function buildHeroBlock(main) {
 function buildAutoBlocks(main) {
   try {
     buildHeroBlock(main);
+    buildRelatedPostsBlock(main);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);

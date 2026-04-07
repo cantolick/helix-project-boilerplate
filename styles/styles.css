@@ -291,6 +291,33 @@ main .section.highlight {
   background-color: var(--highlight-background-color);
 }
 
+body.blog-post main {
+  display: grid;
+  gap: 2rem;
+}
+
+body.blog-post main > .section.blog-sidebar {
+  order: 2;
+}
+
+@media (width >= 900px) {
+  body.blog-post main {
+    align-items: start;
+    column-gap: 3rem;
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+
+  body.blog-post main > .section:not(.blog-sidebar) {
+    grid-column: 1;
+  }
+
+  body.blog-post main > .section.blog-sidebar {
+    grid-column: 2;
+    grid-row: 1 / span 20;
+    margin-top: 0;
+  }
+}
+
 main .section.about .default-content-wrapper {
   max-width: 900px;
 }
