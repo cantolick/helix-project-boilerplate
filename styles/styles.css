@@ -318,7 +318,7 @@ body.blog-post main > .section.blog-sidebar {
 
   body.blog-post main > .section.blog-sidebar {
     grid-column: 2;
-    grid-row: 1 / span 20;
+    grid-row: 1;
     align-self: start;
     margin-top: 0;
     padding-top: calc(1em + 2.75rem);
