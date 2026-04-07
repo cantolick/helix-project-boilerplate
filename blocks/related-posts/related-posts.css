@@ -54,7 +54,10 @@
 
 @media (width >= 900px) {
   .related-posts {
+    margin: 0;
+    max-width: 300px;
     position: sticky;
-    top: calc(var(--nav-height) + 2rem);
+    top: calc(var(--nav-height) + 3rem);
+    width: 100%;
   }
 }
