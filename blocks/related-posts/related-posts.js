@@ -7,6 +7,22 @@ function normalizeList(value) {
     return value.flatMap((item) => normalizeList(item));
   }
 
+  if (typeof value === 'string') {
+    const trimmedValue = value.trim();
+
+    // Query index values for multi-value fields may arrive as a JSON array string.
+    if (trimmedValue.startsWith('[') && trimmedValue.endsWith(']')) {
+      try {
+        const parsedValue = JSON.parse(trimmedValue);
+        if (Array.isArray(parsedValue)) {
+          return normalizeList(parsedValue);
+        }
+      } catch (e) {
+        // Fall back to comma-separated parsing below.
+      }
+    }
+  }
+
   return `${value}`
     .split(',')
     .map((item) => item.trim().toLowerCase())
