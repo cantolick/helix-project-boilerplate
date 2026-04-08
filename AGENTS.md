@@ -99,7 +99,9 @@ Agents must treat this repo as Edge Delivery Services, not classic AEM:
 
 CMS authored content is a key part of every AEM Website. The content of a page is broken into sections. Sections can have default content (text, headings, links, etc.) as well as content in blocks.
 
-If no authored content exists to test against, you can create static HTML files in a `drafts/` folder at the project root. Pass `--html-folder drafts` when starting the dev server. Follow the aem markup structure and save files with `.html` or `.plain.html` extensions.
+Prefer validating against existing authored content first. Only create static HTML files in a `drafts/` folder at the project root when no suitable authored page exists to exercise the change locally. Pass `--html-folder drafts` when starting the dev server. Follow the aem markup structure and save files with `.html` or `.plain.html` extensions.
+
+For this repository, treat `drafts/` as a local validation fallback, not a default implementation step. When the site is using Google Drive or another real content source and an existing page already covers the scenario, do not create draft files just to demonstrate the change.
 
 Background on content and markup structure can be found at https://www.aem.live/developer/markup-sections-blocks and https://www.aem.live/developer/markup-reference respectively.
 
@@ -129,6 +131,16 @@ export default async function decorate(block) {
 Use `curl` and `console.log` to inspect the HTML delivered by the backend and the DOM nodes to be decorated before making assumptions. Remember that authors may omit or add fields to a block, so your code must handle this gracefully.
 
 Each block should be self-contained and re-useable, with CSS and JS files following the naming convention: `blockname.css`, `blockname.js`. Blocks should be responsive and accessible by default.
+
+### Block Registration Requirement
+
+When adding a new authored block, agents must also update the authoring configuration in the same task when applicable:
+
+- `component-definition.json` to register the block in the component library
+- `component-models.json` to define the block fields used by authors
+- `component-filters.json` to allow the block in the relevant parent containers
+
+Do not consider a new block complete until its code, authoring configuration, and local validation are all in place.
 
 ### Auto-Blocking
 
@@ -229,6 +241,7 @@ Agents must follow a structured workflow for all non-trivial tasks.
 ### Step 3: Implement
 - Make minimal, scoped changes
 - Follow block conventions strictly
+- If a new block is added, register it in `component-definition.json`, `component-models.json`, and `component-filters.json` when the block should be authorable
 
 ### Step 4: Review
 - Validate:
@@ -311,6 +324,21 @@ Agents should use:
 
 If a skill conflicts with Adobe documentation, follow Adobe documentation and update the skill later.
 
+## Edge Agent Orchestration
+
+For non-trivial Edge Delivery tasks, prefer specialized subagents over doing all work in one agent context.
+
+Use this split when the task includes a new block, changes authored content structure, alters indexing or metadata, or needs AI-readable output review.
+
+- `Edge Planner` → define the authored content contract, expected DOM, required file changes, and validation path
+- `Edge Implementer` → make the code and authoring configuration changes
+- `AI Agent Consumer` → check whether the rendered result is understandable to an AI consumer and whether any JSON mirrors visible content correctly
+- `Edge Reviewer` → review for regressions, weak assumptions, missing registration, and validation gaps
+
+Skip subagent orchestration only for trivial single-file edits or copy-only tweaks where the extra coordination would add more overhead than value.
+
+When using this split, do not collapse planning, implementation, and review back into a single undocumented pass. Keep each agent focused on its scope and use the result of one stage as input to the next.
+
 ## Local Development Validation (CRITICAL)
 
 This project uses the AEM CLI local dev server.
@@ -335,6 +363,8 @@ For any block or rendering change, agents MUST:
 1. Identify affected page(s)
 2. Load page locally:
    http://localhost:3000/<path>
+  - Prefer an existing authored page already backed by the real content source
+  - Use `drafts/` only if no existing page can validate the change
 
 3. Inspect rendered HTML:
    - verify structure
