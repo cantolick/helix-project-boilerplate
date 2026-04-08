@@ -381,6 +381,25 @@
     ]
   },
   {
+    "id": "reading-time",
+    "fields": [
+      {
+        "component": "text",
+        "name": "heading",
+        "label": "Heading",
+        "valueType": "string",
+        "value": "Reading time"
+      },
+      {
+        "component": "text",
+        "name": "wordsPerMinute",
+        "label": "Words Per Minute",
+        "valueType": "number",
+        "value": "200"
+      }
+    ]
+  },
+  {
     "id": "skills",
     "fields": [
       {
