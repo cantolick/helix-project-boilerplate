@@ -352,6 +352,10 @@ main .section.skills .default-content-wrapper {
   max-width: 900px;
 }
 
+body.blog-post main > .section.reading-time-container > .default-content-wrapper:first-child {
+  margin-bottom: 0.5rem;
+}
+
 main .section.skills .default-content-wrapper > :first-child {
   margin-top: 0;
 }
