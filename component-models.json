@@ -102,7 +102,7 @@
         "valueType": "string",
         "name": "json-ld",
         "label": "JSON-LD",
-        "description": "Paste compact JSON-LD for Article, NewsArticle, or Product schema."
+        "description": "Paste a JSON-LD object (Article, BlogPosting, Person, etc.). EDS renders this server-side as <script type=\"application/ld+json\"> in the page <head> — visible to crawlers and LLMs without JavaScript execution."
       }
     ]
   },
