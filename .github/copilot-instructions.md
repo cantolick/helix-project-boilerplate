@@ -36,3 +36,9 @@ Every feature must support:
 - For non-trivial Edge Delivery work, prefer using scoped Edge agents instead of doing planning, implementation, consumer interpretation, and review in one pass
 - Use `Edge Planner` for contract and validation planning, `Edge Implementer` for implementation, `AI Agent Consumer` for AI-readable interpretation checks, and `Edge Reviewer` for final review
 - Skip this only for trivial edits where orchestration overhead is not justified
+
+## 8. Cloudflare CDN and custom Workers
+- 99% of this project's work is Edge Delivery; the remaining CDN and custom Worker tasks are managed in Cloudflare
+- When a task involves modifying the CDN, custom Workers, Worker routes, cache rules, DNS, or other Cloudflare-managed delivery settings, load and follow the `cloudflare-mcp` skill before proceeding
+- Prefer the `cloudflare-api` MCP server for live Cloudflare state over inferring settings from code or docs alone
+- See `.github/instructions/cloudflare-cdn.instructions.md` for the scoped routing rule
