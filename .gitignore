@@ -10,6 +10,9 @@ helix-importer-ui
 *.bak
 .idea
 
+# VS Code workspace settings with secrets
+.vscode/mcp.json
+
 # Ensure these files are tracked
 !CLAUDE.md
 !AGENTS.md
