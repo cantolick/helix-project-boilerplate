@@ -199,12 +199,67 @@ function isSidekickEnabled() {
 }
 
 /**
+ * Injects a JSON-LD structured data script into the document head.
+ * @param {Object} data The structured data object
+ */
+function injectJsonLd(data) {
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.textContent = JSON.stringify(data);
+  document.head.appendChild(script);
+}
+
+/**
+ * Injects BlogPosting JSON-LD for blog post pages.
+ * The server already renders static JSON-LD via the page's `json-ld` metadata field.
+ * This supplements dynamic per-post signals (headline, date, author, tags) that vary
+ * per post and are not practical to maintain manually in each document.
+ * Note: client-side only — use the `json-ld` metadata field for crawler-critical schemas.
+ */
+function decorateBlogPostingJsonLd() {
+  if (!document.body.classList.contains('blog-post')) return;
+  // Skip if the page already has a server-rendered JSON-LD script
+  if (document.head.querySelector('script[type="application/ld+json"]')) return;
+
+  const headline = getMetadata('og:title') || document.querySelector('h1')?.textContent?.trim();
+  const description = getMetadata('description') || undefined;
+  const datePublished = getMetadata('date') || undefined;
+  const image = getMetadata('og:image') || undefined;
+  const rawTags = getMetadata('article:tag');
+  const category = getMetadata('category');
+  const keywords = rawTags
+    ? rawTags.split(',').map((k) => k.trim()).filter(Boolean)
+    : (category ? [category] : undefined);
+
+  const authorName = getMetadata('author') || 'Craig Antolick';
+  const siteUrl = `${window.location.protocol}//${window.location.host}`;
+  const identity = { '@type': 'Person', name: authorName, url: siteUrl };
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline,
+    url: window.location.href,
+    author: identity,
+    publisher: identity,
+  };
+
+  if (description) schema.description = description;
+  if (datePublished) schema.datePublished = datePublished;
+  if (image) schema.image = image;
+  if (keywords) schema.keywords = keywords;
+
+  injectJsonLd(schema);
+}
+
+/**
  * Loads everything needed to get to LCP.
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
+  decorateBlogPostingJsonLd();
 
   if (getMetadata('experiment')
     || Object.keys(getAllMetadata('campaign')).length
