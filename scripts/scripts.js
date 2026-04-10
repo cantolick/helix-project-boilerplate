@@ -227,9 +227,12 @@ function decorateBlogPostingJsonLd() {
   const image = getMetadata('og:image') || undefined;
   const rawTags = getMetadata('article:tag');
   const category = getMetadata('category');
-  const keywords = rawTags
-    ? rawTags.split(',').map((k) => k.trim()).filter(Boolean)
-    : (category ? [category] : undefined);
+  let keywords;
+  if (rawTags) {
+    keywords = rawTags.split(',').map((k) => k.trim()).filter(Boolean);
+  } else if (category) {
+    keywords = [category];
+  }
 
   const authorName = getMetadata('author') || 'Craig Antolick';
   const siteUrl = `${window.location.protocol}//${window.location.host}`;
