@@ -11,6 +11,28 @@ Use this skill when a task depends on live Cloudflare configuration or Cloudflar
 
 This skill expects the Cloudflare MCP server to be configured with the server name `cloudflare-api`.
 
+### VS Code (local process) — preferred for this project
+
+`.vscode/mcp.json` (already configured in this repo — do not commit API tokens):
+
+```json
+{
+  "servers": {
+    "cloudflare-api": {
+      "command": "npx",
+      "args": ["-y", "@cloudflare/mcp-server-cloudflare", "run", "<account_id>"],
+      "env": {
+        "CLOUDFLARE_API_TOKEN": "<api_token>"
+      }
+    }
+  }
+}
+```
+
+To start: Command Palette → **MCP: List Servers** → Start `cloudflare-api`. The MCP server must be running before starting a new chat for it to be available.
+
+### Claude Code / Claude.ai / CI (remote HTTP)
+
 ```json
 {
   "mcpServers": {
@@ -21,11 +43,15 @@ This skill expects the Cloudflare MCP server to be configured with the server na
 }
 ```
 
-When connecting interactively, expect Cloudflare OAuth authorization and permission selection.
+When connecting interactively, expect Cloudflare OAuth authorization and permission selection. For CI/CD, provide a bearer token in the `Authorization` header using a Cloudflare API token scoped to the required permissions. Prefer `/mcp` (streamable-http) over the deprecated `/sse` endpoint.
 
-For CI/CD or automation, Cloudflare documents using a bearer token in the `Authorization` header with a Cloudflare API token scoped to the required permissions.
+### Cross-agent compatibility
 
-Cloudflare documents both `streamable-http` on `/mcp` and deprecated `sse` transport on `/sse`. Prefer the documented `/mcp` endpoint.
+Both connection modes expose the same tool surface. This skill works in:
+- **VS Code Copilot** — via local process MCP (`.vscode/mcp.json`)
+- **Claude Code** — via remote HTTP MCP or local process
+- **Claude.ai** — via remote HTTP MCP (OAuth)
+- **Codex** — if MCP tool support is available in the session; otherwise fall back to documented Cloudflare guidance
 
 If the MCP server is unavailable, say so clearly and fall back only to repository inspection, user-provided details, or documented Cloudflare guidance.
 
