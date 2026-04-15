@@ -35,12 +35,16 @@ Use `aem import` only for importer workflows, not for normal block validation.
    - `curl http://localhost:3000/<path>.plain.html`
    - `curl http://localhost:3000/<path>.md`
    - `curl http://localhost:3000/query-index.json`
-4. Verify:
+4. Inspect rendered output with `agent-browser` or Playwright when available:
+   - verify final DOM structure after decoration
+   - verify browser console output
+   - verify user-visible rendering and interactions when relevant
+5. Verify:
    - expected markup shape
    - expected block classes and transformed DOM
    - expected metadata or index fields
    - no console errors
-5. If AI-readable JSON exists, verify:
+6. If AI-readable JSON exists, verify:
    - `.ai-data` script exists
    - JSON is valid
    - fields match visible content exactly
@@ -64,4 +68,4 @@ Do not recommend `--html-folder` unless no suitable authored page exists for val
 
 ## Failure Rule
 
-Do not claim success until the local output or query response was inspected. If localhost is unavailable, say so plainly and describe what could not be verified.
+Do not claim success until the local output or query response was inspected. Prefer `agent-browser` or Playwright when available for rendered validation. If localhost or browser automation is unavailable, say so plainly and describe what could not be verified.

@@ -53,7 +53,7 @@ Agents must treat this repo as Edge Delivery Services, not classic AEM:
 - Install dependencies: `npm install`
 - Start local development: `npx -y @adobe/aem-cli up --no-open --forward-browser-logs` (run in background, if possible)
   - Install the AEM CLI globally by running `npm install -g @adobe/aem-cli` then `aem up` is equivalent to the command above
-  - The dev server runs at `http://localhost:3000` with auto-reload. Open it in playwright, puppeteer, or a browser. If none are available, ask the human to open it and give feedback.
+  - The dev server runs at `http://localhost:3000` with auto-reload. Prefer `agent-browser` or Playwright for rendered validation when available. If browser automation is unavailable, fall back to a browser and `curl`-based inspection.
 - Compile and compress managed block assets for production: `npm run minify`
 - Verify compiled block assets are in sync with source files: `npm run minify:check`
 - Report raw, gzip, and brotli sizes for managed block assets: `npm run minify:report`
@@ -453,6 +453,7 @@ For any block or rendering change, agents MUST:
    - correct DOM structure
    - expected content rendered
    - expected query/index fields rendered when metadata or feeds are involved
+   - prefer `agent-browser` or Playwright to inspect rendered DOM, console output, and interactions when available
 
 ---
 
