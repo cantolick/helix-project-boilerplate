@@ -23,6 +23,14 @@ Required starting points:
 - `https://www.aem.live/llms.txt`
 - `https://www.aem.live/developer/ai-coding-agents`
 
+Reference order for agent work in this repo:
+1. Adobe documentation on `www.aem.live`
+2. Repo-local instructions and skills in `AGENTS.md`, `AGENT_SKILL.md`, and `.ai/skills/`
+3. `helix-mcp` when available for EDS-aware docs, block inventory, page status, and RUM-oriented inspection
+4. `Context7` when fresh third-party or library documentation is needed after checking Adobe guidance first
+
+Use auxiliary references to improve speed and accuracy, not to override Adobe guidance or local repo rules.
+
 Prefer Adobe sources over memory or generic web results. Unless the user asks otherwise, restrict web research to `www.aem.live`.
 
 When choosing docs, prefer:
@@ -46,24 +54,77 @@ Agents must treat this repo as Edge Delivery Services, not classic AEM:
 - Start local development: `npx -y @adobe/aem-cli up --no-open --forward-browser-logs` (run in background, if possible)
   - Install the AEM CLI globally by running `npm install -g @adobe/aem-cli` then `aem up` is equivalent to the command above
   - The dev server runs at `http://localhost:3000` with auto-reload. Open it in playwright, puppeteer, or a browser. If none are available, ask the human to open it and give feedback.
+- Compile and compress managed block assets for production: `npm run minify`
+- Verify compiled block assets are in sync with source files: `npm run minify:check`
+- Report raw, gzip, and brotli sizes for managed block assets: `npm run minify:report`
+- Enforce brotli performance budgets for managed block assets: `npm run minify:budget`
 - Run linting before committing: `npm run lint`
 - Auto-Fix linting issues: `npm run lint:fix`
+
+## Recommended Local Tools For Agents
+
+Adobe recommends installing a few command-line tools that make AI-assisted development faster and more reliable. They are optional, but useful in this repo:
+
+- `rg` (ripgrep) for fast codebase search
+- `jq` for JSON inspection and transformation
+- `gh` for GitHub and PR workflows
+- `curl` for local preview, `.plain.html`, and docs inspection
+- `sg` (ast-grep) for syntax-aware search and transformations
+- `http` (HTTPie) for human-friendly HTTP requests
+- `fzf` for fuzzy selection
+- `fd` for fast file discovery
+- `bat` for readable file output
+
+These tools improve the agent workflow, but they do not change the managed block compile/compress workflow or the pre-commit requirements in this repo.
+
+## Source, Compile, and Compression Workflow
+
+This repository keeps human-readable source files and compiled production files side by side for managed block JS and CSS tracked in `agent-manifest.json`.
+
+- Always edit `.src.js` and `.src.css` files for managed assets.
+- Never hand-edit the compiled `.js` and `.css` production files for managed assets.
+- All repo-owned block assets should be compiled and compressed through this workflow unless the user explicitly says otherwise.
+- After any change to a managed source file, run `npm run minify` in the same task so the compiled output and `agent-manifest.json` are updated immediately.
+- Before claiming success on JS or CSS work, run `npm run minify:check`, `npm run minify:budget`, and `npm run lint`.
+- Treat compiled block output size as a performance concern. Use `npm run minify:report` when comparing approaches or defending performance tradeoffs.
+- Before commit, confirm compiled block assets are regenerated and the budget check passes.
+- When reviewing or explaining code, read the `.src.js` and `.src.css` files rather than the compiled outputs.
+- Keep `*.src.js`, `*.src.css`, `agent-manifest.json`, and `AGENT_SKILL.md` excluded from Edge Delivery serving via `.hlxignore`.
+
+Managed assets currently include block files only:
+
+- `blocks/*/*.js` and `blocks/*/*.css`
+
+Do not apply this compile/compress workflow to core EDS/runtime, upgrade-sensitive, or vendor assets such as:
+
+- `scripts/**`
+- `styles/**`
+- `scripts/aem.js`
+- `scripts/lib-franklin.js`
+- `scripts/dompurify.min.js`
+- `styles/libs/**`
+- `plugins/**`
+
+Core `scripts/` and `styles/` files must remain directly editable and upgradeable. Agents must not move them into the block compile/compress pipeline unless the user explicitly requests that change.
 
 ## Project Structure
 
 ```
 ├── blocks/          # Reusable content blocks
     └── {blockname}/   - Individual block directory
-        ├── {blockname}.js      # Block's JavaScript
-        └── {blockname}.css     # Block's styles
+        ├── {blockname}.src.js  # Editable source JavaScript for managed assets
+        ├── {blockname}.src.css # Editable source CSS for managed assets
+        ├── {blockname}.js      # Compiled and compressed production JavaScript
+        └── {blockname}.css     # Compiled and compressed production CSS
 ├── styles/          # Global styles and CSS
-    ├── styles.css          # Minimal global styling and layout for your website required for LCP
-    ├── lazy-styles.css     # Additional global styling and layout for below the fold/post LCP content
-    └── fonts.css           # Font definitions
+    ├── styles.css          # Editable and deployed critical global styles
+    ├── lazy-styles.css     # Editable and deployed deferred global styles
+    └── fonts.css           # Editable and deployed font declarations
 ├── scripts/         # JavaScript libraries and utilities
     ├── aem.js           # Core AEM Library for Edge Delivery page decoration logic (NEVER MODIFY THIS FILE)
-    ├── scripts.js       # Global JavaScript utilities, main entry point for page decoration
-    └── delayed.js       # Delayed functionality such as martech loading
+    ├── scripts.js       # Editable and deployed main page decoration logic
+    └── delayed.js       # Editable and deployed delayed functionality
+├── agent-manifest.json # Registry of managed source/output pairs
 ├── fonts/           # Web fonts
 ├── icons/           # SVG icons
 ├── head.html        # Global HTML head content
@@ -77,6 +138,8 @@ Agents must treat this repo as Edge Delivery Services, not classic AEM:
 - Follow Airbnb ESLint rules (already configured)
 - Always include `.js` file extensions in imports
 - Use Unix line endings (LF)
+- For managed block files in `agent-manifest.json`, edit the `.src.js` source file and compile the production `.js` file with `npm run minify`
+- Do not apply this workflow to core EDS/runtime JavaScript in `scripts/`
 
 ### CSS
 - Follow Stylelint standard configuration
@@ -87,6 +150,8 @@ Agents must treat this repo as Edge Delivery Services, not classic AEM:
   - Bad: `.item-list`
   - Good: `.{blockname} .item-list`   
 - Avoid classes `{blockname}-container` and `{blockname}-wrapper` as those are used on sections and could be confusing.
+- For managed block files in `agent-manifest.json`, edit the `.src.css` source file and compile the production `.css` file with `npm run minify`
+- Do not apply this workflow to global or core styles in `styles/`
 
 ### HTML
 - Use semantic HTML5 elements
@@ -132,6 +197,8 @@ Use `curl` and `console.log` to inspect the HTML delivered by the backend and th
 
 Each block should be self-contained and re-useable, with CSS and JS files following the naming convention: `blockname.css`, `blockname.js`. Blocks should be responsive and accessible by default.
 
+In this repository, if the block is part of the managed asset set, the editable files are `blockname.src.js` and `blockname.src.css`, and the production `blockname.js` and `blockname.css` files must be compiled from them before the task is complete.
+
 ### Block Registration Requirement
 
 When adding a new authored block, agents must also update the authoring configuration in the same task when applicable:
@@ -161,6 +228,7 @@ Pages are progressively loaded in three phases to maximize performance. This pro
 - Images uploaded by authors are automatically optimized, all images and assets committed to git must be optimized and checked for size
 - Use lazy loading for non-critical resources (`lazy-styles.css` and `delayed.js`)
 - Minimize JavaScript bundle size by avoiding dependencies, using automatic code splitting provided by `/blocks/`
+- For managed block assets, treat compile/compress output size and brotli budget compliance as part of the performance review
 
 ### Accessibility
 - Ensure proper heading hierarchy
@@ -242,12 +310,18 @@ Agents must follow a structured workflow for all non-trivial tasks.
 - Make minimal, scoped changes
 - Follow block conventions strictly
 - If a new block is added, register it in `component-definition.json`, `component-models.json`, and `component-filters.json` when the block should be authorable
+- If a managed JS or CSS file changes, edit the `.src` file, compile/compress the production output with `npm run minify`, and update `agent-manifest.json` in the same task
+- If a repo-owned block exists outside the workflow, bring it into the managed block compile/compress workflow unless the user explicitly says not to
+- Do not move core EDS/runtime files into that workflow
 
 ### Step 4: Review
 - Validate:
   - Edge compatibility
   - performance impact
   - accessibility
+  - `npm run minify:check` passes for managed JS/CSS assets
+  - `npm run minify:budget` passes for managed JS/CSS assets
+  - compiled block assets are ready before commit
 
 ### Step 5: Reflect
 - Ask: "Is this understandable by both humans and AI agents?"
@@ -321,6 +395,7 @@ Agents should use:
 
 - edge-agentify → when modifying blocks, metadata, indexing, or content structure
 - local-validate → after implementation and before claiming success
+- reference-sourcing → when deciding whether Adobe docs, `helix-mcp`, or `Context7` is the right source for the task
 
 If a skill conflicts with Adobe documentation, follow Adobe documentation and update the skill later.
 
@@ -330,6 +405,7 @@ For non-trivial Edge Delivery tasks, prefer specialized subagents over doing all
 
 Use this split when the task includes a new block, changes authored content structure, alters indexing or metadata, or needs AI-readable output review.
 
+- `Reference Scout` → confirm the best source order for the task, prefer Adobe docs first, then route to `helix-mcp` or `Context7` only when they add value
 - `Edge Planner` → define the authored content contract, expected DOM, required file changes, and validation path
 - `Edge Implementer` → make the code and authoring configuration changes
 - `AI Agent Consumer` → check whether the rendered result is understandable to an AI consumer and whether any JSON mirrors visible content correctly

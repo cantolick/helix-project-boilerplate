@@ -1,17 +1,1 @@
-import { createOptimizedPicture } from '../../scripts/aem.js';
-
-export default function decorate(block) {
-  /* change to ul, li */
-  const ul = document.createElement('ul');
-  [...block.children].forEach((row) => {
-    const li = document.createElement('li');
-    while (row.firstElementChild) li.append(row.firstElementChild);
-    [...li.children].forEach((div) => {
-      if (div.children.length === 1 && div.querySelector('picture')) div.className = 'cards-card-image';
-      else div.className = 'cards-card-body';
-    });
-    ul.append(li);
-  });
-  ul.querySelectorAll('picture > img').forEach((img) => img.closest('picture').replaceWith(createOptimizedPicture(img.src, img.alt, false, [{ width: '750' }])));
-  block.replaceChildren(ul);
-}
+import{createOptimizedPicture as e}from"../../scripts/aem.js";export default function r(r){const c=document.createElement("ul");[...r.children].forEach(e=>{const r=document.createElement("li");for(;e.firstElementChild;)r.append(e.firstElementChild);[...r.children].forEach(e=>{1===e.children.length&&e.querySelector("picture")?e.className="cards-card-image":e.className="cards-card-body"}),c.append(r)}),c.querySelectorAll("picture > img").forEach(r=>r.closest("picture").replaceWith(e(r.src,r.alt,!1,[{width:"750"}]))),r.replaceChildren(c)}

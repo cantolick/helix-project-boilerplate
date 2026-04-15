@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Code Block Validation</title>
+  </head>
+  <body>
+    <main>
+      <div>
+        <h1>Code Block Validation</h1>
+        <p>This draft validates copy-paste-friendly rendering for JavaScript, CSS, HTML, and Markdown.</p>
+      </div>
+      <div>
+        <div class="code-block">
+          <div>
+            <div>Title</div>
+            <div>scripts/example.js</div>
+          </div>
+          <div>
+            <div>Language</div>
+            <div>js</div>
+          </div>
+          <div>
+            <div>Code</div>
+            <div><pre><code>export function greet(name) {
+  return `Hello, ${name}!`;
+}</code></pre></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="code-block">
+          <div>
+            <div>Title</div>
+            <div>styles/example.css</div>
+          </div>
+          <div>
+            <div>Language</div>
+            <div>css</div>
+          </div>
+          <div>
+            <div>Code</div>
+            <div><pre><code>.example-card {
+  border-radius: 1rem;
+  padding: 1.5rem;
+  background: var(--surface-color);
+}</code></pre></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="code-block">
+          <div>
+            <div>Title</div>
+            <div>components/example.html</div>
+          </div>
+          <div>
+            <div>Language</div>
+            <div>html</div>
+          </div>
+          <div>
+            <div>Code</div>
+            <div><pre><code>&lt;section class="example-card"&gt;
+  &lt;h2&gt;Hello&lt;/h2&gt;
+  &lt;p&gt;Semantic markup stays escaped for safe copy and paste.&lt;/p&gt;
+&lt;/section&gt;</code></pre></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="code-block">
+          <div>
+            <div>Title</div>
+            <div>README.md</div>
+          </div>
+          <div>
+            <div>Language</div>
+            <div>md</div>
+          </div>
+          <div>
+            <div>Code</div>
+            <div><pre><code>## Example
+
+- Keep code copyable
+- Preserve indentation
+- Render language clearly</code></pre></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
