@@ -1,5 +1,9 @@
 .*
 *.md
+*.src.js
+*.src.css
+agent-manifest.json
+AGENT_SKILL.md
 karma.config.js
 LICENSE
 package.json

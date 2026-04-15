@@ -46,24 +46,54 @@ Agents must treat this repo as Edge Delivery Services, not classic AEM:
 - Start local development: `npx -y @adobe/aem-cli up --no-open --forward-browser-logs` (run in background, if possible)
   - Install the AEM CLI globally by running `npm install -g @adobe/aem-cli` then `aem up` is equivalent to the command above
   - The dev server runs at `http://localhost:3000` with auto-reload. Open it in playwright, puppeteer, or a browser. If none are available, ask the human to open it and give feedback.
+- Regenerate deployed JS/CSS from source files: `npm run minify`
+- Verify generated JS/CSS is in sync with source files: `npm run minify:check`
 - Run linting before committing: `npm run lint`
 - Auto-Fix linting issues: `npm run lint:fix`
+
+## Source and Minified Asset Workflow
+
+This repository keeps human-readable source files and generated deployment files side by side for managed block JS and CSS tracked in `agent-manifest.json`.
+
+- Always edit `.src.js` and `.src.css` files for managed assets.
+- Never hand-edit the generated `.js` and `.css` deployment files for managed assets.
+- After any change to a managed source file, run `npm run minify` in the same task so the output file and `agent-manifest.json` are updated immediately.
+- Before claiming success on JS or CSS work, run `npm run minify:check` and `npm run lint`.
+- When reviewing or explaining code, read the `.src.js` and `.src.css` files rather than the generated outputs.
+- Keep `*.src.js`, `*.src.css`, `agent-manifest.json`, and `AGENT_SKILL.md` excluded from Edge Delivery serving via `.hlxignore`.
+
+Managed assets currently include block files only:
+
+- `blocks/*/*.js` and `blocks/*/*.css`
+
+Do not apply this source/minified workflow to upstream or vendor assets such as:
+
+- `scripts/**`
+- `styles/**`
+- `scripts/aem.js`
+- `scripts/lib-franklin.js`
+- `scripts/dompurify.min.js`
+- `styles/libs/**`
+- `plugins/**`
 
 ## Project Structure
 
 ```
 ├── blocks/          # Reusable content blocks
     └── {blockname}/   - Individual block directory
-        ├── {blockname}.js      # Block's JavaScript
-        └── {blockname}.css     # Block's styles
+        ├── {blockname}.src.js  # Editable source JavaScript for managed assets
+        ├── {blockname}.src.css # Editable source CSS for managed assets
+        ├── {blockname}.js      # Generated deployed JavaScript
+        └── {blockname}.css     # Generated deployed CSS
 ├── styles/          # Global styles and CSS
-    ├── styles.css          # Minimal global styling and layout for your website required for LCP
-    ├── lazy-styles.css     # Additional global styling and layout for below the fold/post LCP content
-    └── fonts.css           # Font definitions
+    ├── styles.css          # Editable and deployed critical global styles
+    ├── lazy-styles.css     # Editable and deployed deferred global styles
+    └── fonts.css           # Editable and deployed font declarations
 ├── scripts/         # JavaScript libraries and utilities
     ├── aem.js           # Core AEM Library for Edge Delivery page decoration logic (NEVER MODIFY THIS FILE)
-    ├── scripts.js       # Global JavaScript utilities, main entry point for page decoration
-    └── delayed.js       # Delayed functionality such as martech loading
+    ├── scripts.js       # Editable and deployed main page decoration logic
+    └── delayed.js       # Editable and deployed delayed functionality
+├── agent-manifest.json # Registry of managed source/output pairs
 ├── fonts/           # Web fonts
 ├── icons/           # SVG icons
 ├── head.html        # Global HTML head content
@@ -77,6 +107,7 @@ Agents must treat this repo as Edge Delivery Services, not classic AEM:
 - Follow Airbnb ESLint rules (already configured)
 - Always include `.js` file extensions in imports
 - Use Unix line endings (LF)
+- For managed block files in `agent-manifest.json`, edit the `.src.js` source file and regenerate the deployed `.js` file with `npm run minify`
 
 ### CSS
 - Follow Stylelint standard configuration
@@ -87,6 +118,7 @@ Agents must treat this repo as Edge Delivery Services, not classic AEM:
   - Bad: `.item-list`
   - Good: `.{blockname} .item-list`   
 - Avoid classes `{blockname}-container` and `{blockname}-wrapper` as those are used on sections and could be confusing.
+- For managed block files in `agent-manifest.json`, edit the `.src.css` source file and regenerate the deployed `.css` file with `npm run minify`
 
 ### HTML
 - Use semantic HTML5 elements
@@ -131,6 +163,8 @@ export default async function decorate(block) {
 Use `curl` and `console.log` to inspect the HTML delivered by the backend and the DOM nodes to be decorated before making assumptions. Remember that authors may omit or add fields to a block, so your code must handle this gracefully.
 
 Each block should be self-contained and re-useable, with CSS and JS files following the naming convention: `blockname.css`, `blockname.js`. Blocks should be responsive and accessible by default.
+
+In this repository, if the block is part of the managed asset set, the editable files are `blockname.src.js` and `blockname.src.css`, and the deployed `blockname.js` and `blockname.css` files must be regenerated from them before the task is complete.
 
 ### Block Registration Requirement
 
@@ -242,12 +276,14 @@ Agents must follow a structured workflow for all non-trivial tasks.
 - Make minimal, scoped changes
 - Follow block conventions strictly
 - If a new block is added, register it in `component-definition.json`, `component-models.json`, and `component-filters.json` when the block should be authorable
+- If a managed JS or CSS file changes, edit the `.src` file, regenerate the deployed output with `npm run minify`, and update `agent-manifest.json` in the same task
 
 ### Step 4: Review
 - Validate:
   - Edge compatibility
   - performance impact
   - accessibility
+  - `npm run minify:check` passes for managed JS/CSS assets
 
 ### Step 5: Reflect
 - Ask: "Is this understandable by both humans and AI agents?"

@@ -1,0 +1,126 @@
+/* block specific CSS goes here */
+
+main .hero-container > div {
+  max-width: unset;
+}
+  
+main .hero-container {
+  padding: 0;
+}
+  
+main .hero {
+  height: 100vh;
+  position: relative;
+  background: var(--hero-overlay-color);
+  text-align: center;
+  background-size: cover;
+  padding: 15px;
+  overflow: hidden;
+}
+
+main .hero > div > div{
+  padding-top: 3em;
+}
+
+main .hero h1 {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  color: white;
+  font-weight: 900;
+  font-size: 5em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 0.9em;
+  margin-bottom: 0;
+}
+
+main .hero h2 {
+  color: var(--hero-subheading-color);
+  font-weight: 500;
+  font-size: 2.25em;
+  margin: 0;
+}
+
+@media only screen and (width >= 993px) {
+  main .hero {
+    height: 60vh;
+    min-height: 480px;
+    max-height: 650px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+
+  main .hero > div {
+    width: 100%;
+  }
+
+  main .hero > div > div {
+    padding-top: 0;
+  }
+}
+
+@media only screen and (width <=992px) {
+  main .hero  {
+  height: auto;
+  min-height: 0;
+  padding: 100px 15px;
+  position: relative;
+  transform: none;
+  left: auto;
+  top: auto;
+  }
+
+  main .hero h1 {
+  font-size: 3em;
+  }
+
+  main .hero h2 {
+  font-size: 1.75em;
+  }
+}
+
+@media only screen and (width <=480px) {
+  main .hero h1 {
+  font-size: 1.5em;
+  }
+
+  main .hero h2 {
+  font-size: 1em;
+  }
+
+  main .hero a {
+  font-size: 0.9em;
+  padding: 5px 10px;
+  }
+}
+
+@media only screen and (width <=768px) {
+  main .hero h1 {
+  font-size: 2em;
+  }
+
+  main .hero h2 {
+  font-size: 1.3em;
+  }
+
+  main .hero a {
+  padding: 10px 20px;
+  }
+}
+
+main .hero picture {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  object-fit: cover;
+  box-sizing: border-box;
+}
+
+main .hero img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
