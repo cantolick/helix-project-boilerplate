@@ -6,6 +6,8 @@ Purpose: maintain readable `.src.js` and `.src.css` files for managed block asse
 
 - Treat `.src.js` and `.src.css` files as the editable source of truth.
 - Treat `.js` and `.css` files covered by `agent-manifest.json` as compiled production artifacts.
+- All repo-owned block assets should participate in the compile/compress workflow unless the user explicitly says otherwise.
+- Core EDS/runtime files must remain directly editable and upgradeable; do not fold them into the block compile/compress pipeline.
 - Never edit generated output files directly.
 - Keep `agent-manifest.json` updated whenever source or output files change.
 - Keep `*.src.js`, `*.src.css`, `agent-manifest.json`, and `AGENT_SKILL.md` ignored by EDS via `.hlxignore`.
@@ -17,7 +19,7 @@ This repo currently manages first-party block files in:
 - `blocks/*/*.js`
 - `blocks/*/*.css`
 
-The workflow intentionally excludes upstream or third-party assets such as:
+The workflow intentionally excludes core EDS/runtime and third-party assets such as:
 
 - `scripts/**`
 - `styles/**`
@@ -42,6 +44,12 @@ The workflow intentionally excludes upstream or third-party assets such as:
 3. Review both the source file and compiled output.
 4. Run `npm run minify:check`, `npm run minify:budget`, and `npm run lint`.
 5. Before commit, confirm the compiled block assets are regenerated and the performance budget check passes.
+
+## Upgradeability Rule
+
+- Do not move core EDS/runtime files into this workflow.
+- Do not compress `scripts/` or `styles/` through the managed block pipeline.
+- Keep upstream-friendly files readable so future Adobe or project upgrades stay straightforward.
 
 ## Review Rule
 

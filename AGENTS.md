@@ -59,6 +59,7 @@ This repository keeps human-readable source files and compiled production files 
 
 - Always edit `.src.js` and `.src.css` files for managed assets.
 - Never hand-edit the compiled `.js` and `.css` production files for managed assets.
+- All repo-owned block assets should be compiled and compressed through this workflow unless the user explicitly says otherwise.
 - After any change to a managed source file, run `npm run minify` in the same task so the compiled output and `agent-manifest.json` are updated immediately.
 - Before claiming success on JS or CSS work, run `npm run minify:check`, `npm run minify:budget`, and `npm run lint`.
 - Treat compiled block output size as a performance concern. Use `npm run minify:report` when comparing approaches or defending performance tradeoffs.
@@ -70,7 +71,7 @@ Managed assets currently include block files only:
 
 - `blocks/*/*.js` and `blocks/*/*.css`
 
-Do not apply this compile/compress workflow to upstream or vendor assets such as:
+Do not apply this compile/compress workflow to core EDS/runtime, upgrade-sensitive, or vendor assets such as:
 
 - `scripts/**`
 - `styles/**`
@@ -79,6 +80,8 @@ Do not apply this compile/compress workflow to upstream or vendor assets such as
 - `scripts/dompurify.min.js`
 - `styles/libs/**`
 - `plugins/**`
+
+Core `scripts/` and `styles/` files must remain directly editable and upgradeable. Agents must not move them into the block compile/compress pipeline unless the user explicitly requests that change.
 
 ## Project Structure
 
@@ -112,6 +115,7 @@ Do not apply this compile/compress workflow to upstream or vendor assets such as
 - Always include `.js` file extensions in imports
 - Use Unix line endings (LF)
 - For managed block files in `agent-manifest.json`, edit the `.src.js` source file and compile the production `.js` file with `npm run minify`
+- Do not apply this workflow to core EDS/runtime JavaScript in `scripts/`
 
 ### CSS
 - Follow Stylelint standard configuration
@@ -123,6 +127,7 @@ Do not apply this compile/compress workflow to upstream or vendor assets such as
   - Good: `.{blockname} .item-list`   
 - Avoid classes `{blockname}-container` and `{blockname}-wrapper` as those are used on sections and could be confusing.
 - For managed block files in `agent-manifest.json`, edit the `.src.css` source file and compile the production `.css` file with `npm run minify`
+- Do not apply this workflow to global or core styles in `styles/`
 
 ### HTML
 - Use semantic HTML5 elements
@@ -282,6 +287,8 @@ Agents must follow a structured workflow for all non-trivial tasks.
 - Follow block conventions strictly
 - If a new block is added, register it in `component-definition.json`, `component-models.json`, and `component-filters.json` when the block should be authorable
 - If a managed JS or CSS file changes, edit the `.src` file, compile/compress the production output with `npm run minify`, and update `agent-manifest.json` in the same task
+- If a repo-owned block exists outside the workflow, bring it into the managed block compile/compress workflow unless the user explicitly says not to
+- Do not move core EDS/runtime files into that workflow
 
 ### Step 4: Review
 - Validate:
