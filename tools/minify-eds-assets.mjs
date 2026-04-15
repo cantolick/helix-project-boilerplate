@@ -1,8 +1,11 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { brotliCompressSync, gzipSync } from 'node:zlib';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { tokenizer } from 'acorn';
+import { transform as transformCss } from 'lightningcss';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { minify as minifyJsSource } from 'terser';
 
 const filePath = fileURLToPath(import.meta.url);
 const ROOT = path.resolve(path.dirname(filePath), '..');
@@ -45,128 +48,93 @@ const MANAGED_FILES = [
 ];
 
 const MANIFEST_PATH = path.join(ROOT, 'agent-manifest.json');
-const JS_KEYWORDS_REQUIRING_SPACE = new Set([
-  'break',
-  'case',
-  'continue',
-  'delete',
-  'do',
-  'else',
-  'in',
-  'instanceof',
-  'new',
-  'of',
-  'return',
-  'throw',
-  'typeof',
-  'void',
-  'yield',
-]);
+const DEFAULT_BUDGETS = {
+  js: 700,
+  css: 500,
+};
+const BUDGET_OVERRIDES = {
+  'blocks/blogfeed/blogfeed.js': 1600,
+  'blocks/blogfeed/blogfeed.css': 1100,
+  'blocks/code/code.js': 700,
+  'blocks/header/header.js': 900,
+  'blocks/header/header.css': 950,
+  'blocks/map/map.js': 2300,
+  'blocks/map/map.css': 850,
+  'blocks/related-posts/related-posts.js': 950,
+};
 
 function toAbsolute(relPath) {
   return path.join(ROOT, relPath);
 }
 
-function needsKeywordSeparator(previous, current) {
-  return JS_KEYWORDS_REQUIRING_SPACE.has(previous.value)
-    && /^[A-Za-z0-9_$"'`/[{(+-]/.test(current.raw);
-}
-
-function needsTokenSeparator(previous, current) {
-  if (!previous) return false;
-  if (needsKeywordSeparator(previous, current)) return true;
-
-  const prevRaw = previous.raw;
-  const currentRaw = current.raw;
-  const prevEnd = prevRaw.slice(-1);
-  const currentStart = currentRaw[0];
-
-  if (/[A-Za-z0-9_$#]/.test(prevEnd) && /[A-Za-z0-9_$#]/.test(currentStart)) {
-    return true;
+async function minifyJs(source) {
+  if (!source.trim()) {
+    return '';
   }
 
-  if ((prevEnd === '+' && currentStart === '+')
-    || (prevEnd === '-' && currentStart === '-')
-    || (prevEnd === '/' && currentStart === '/')) {
-    return true;
-  }
-
-  return false;
-}
-
-function getJsLicenseComments(source) {
-  const comments = [];
-  tokenizer(source, {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    onComment: (block, text) => {
-      const comment = block ? `/*${text}*/` : `//${text}`;
-      if (comment.startsWith('/*!')) comments.push(comment.trim());
+  const result = await minifyJsSource(source, {
+    module: true,
+    compress: {
+      defaults: true,
+      passes: 2,
+    },
+    mangle: true,
+    format: {
+      comments: /^!|@license|@preserve/i,
     },
   });
-  return comments;
-}
 
-function minifyJs(source) {
-  const comments = getJsLicenseComments(source);
-  const tokens = [];
-  const tokenStream = tokenizer(source, {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-  });
-
-  for (let token = tokenStream.getToken(); token.type.label !== 'eof'; token = tokenStream.getToken()) {
-    tokens.push({
-      raw: source.slice(token.start, token.end),
-      start: token.start,
-      end: token.end,
-      value: token.value,
-    });
+  if (typeof result.code !== 'string') {
+    throw new Error('Terser returned no output for a managed block script.');
   }
 
-  let output = comments.length ? `${comments.join('\n')}\n` : '';
-  let previous = null;
-
-  tokens.forEach((token) => {
-    const between = previous ? source.slice(previous.end, token.start) : '';
-    const hadLineBreak = /\r|\n/.test(between);
-
-    if (previous && hadLineBreak && ['return', 'throw', 'break', 'continue'].includes(previous.value)) {
-      output += ';';
-    } else if (needsTokenSeparator(previous, token)) {
-      output += ' ';
-    }
-
-    output += token.raw;
-    previous = token;
-  });
-
-  return output
-    .replace(/;;+/g, ';')
-    .trim();
+  return result.code.trim();
 }
 
-function minifyCss(source) {
-  const licenseComments = [];
-  let working = source.replace(/\/\*!([\s\S]*?)\*\//g, (match) => {
-    licenseComments.push(match.trim());
-    return '';
+function minifyCss(source, filename) {
+  const result = transformCss({
+    filename,
+    code: Buffer.from(source),
+    minify: true,
+    sourceMap: false,
   });
 
-  working = working.replace(/\/\*[\s\S]*?\*\//g, '');
-  working = working.replace(/\s+/g, ' ');
-  working = working.replace(/\s*([{};:,>+~])\s*/g, '$1');
-  working = working.replace(/;}/g, '}');
-  working = working.replace(/@media\(/g, '@media(');
-  working = working.replace(/\s*\)\s*/g, ')');
-  working = working.replace(/\s*\(\s*/g, '(');
-  working = working.trim();
+  return result.code.toString().trim();
+}
 
-  if (licenseComments.length) {
-    return `${licenseComments.join('\n')}\n${working}`.trim();
+async function generateOutput(entry, source) {
+  if (entry.type === 'js') {
+    return minifyJs(source);
   }
 
-  return working;
+  return minifyCss(source, entry.output);
+}
+
+function getCompressedSizes(content) {
+  const buffer = Buffer.from(content);
+
+  return {
+    raw: buffer.length,
+    gzip: gzipSync(buffer, { level: 9 }).length,
+    brotli: brotliCompressSync(buffer).length,
+  };
+}
+
+function formatBytes(size) {
+  return size.toString().padStart(6, ' ');
+}
+
+function createReportLine(entry, sizes) {
+  return [
+    entry.output.padEnd(40, ' '),
+    formatBytes(sizes.raw),
+    formatBytes(sizes.gzip),
+    formatBytes(sizes.brotli),
+  ].join('  ');
+}
+
+function getBudget(entry) {
+  return BUDGET_OVERRIDES[entry.output] || DEFAULT_BUDGETS[entry.type];
 }
 
 async function ensureSourceFile(entry) {
@@ -187,7 +155,7 @@ async function syncEntry(entry, mode) {
   const sourcePath = toAbsolute(entry.source);
   const outputPath = toAbsolute(entry.output);
   const source = await fs.readFile(sourcePath, 'utf8');
-  const nextOutput = entry.type === 'js' ? minifyJs(source) : minifyCss(source);
+  const nextOutput = await generateOutput(entry, source);
 
   try {
     const currentOutput = await fs.readFile(outputPath, 'utf8');
@@ -227,12 +195,74 @@ async function writeManifest(entries) {
   await fs.writeFile(MANIFEST_PATH, `${JSON.stringify(manifest, null, 2)}\n`);
 }
 
+async function reportEntries() {
+  const results = await Promise.all(MANAGED_FILES.map(async (entry) => {
+    await ensureSourceFile(entry);
+    const sourcePath = toAbsolute(entry.source);
+    const source = await fs.readFile(sourcePath, 'utf8');
+    const output = await generateOutput(entry, source);
+
+    return {
+      entry,
+      sizes: getCompressedSizes(output),
+    };
+  }));
+
+  process.stdout.write('Output file                                 raw    gzip  brotli\n');
+  results.forEach(({ entry, sizes }) => {
+    process.stdout.write(`${createReportLine(entry, sizes)}\n`);
+  });
+}
+
+async function checkBudgets() {
+  const results = await Promise.all(MANAGED_FILES.map(async (entry) => {
+    await ensureSourceFile(entry);
+    const sourcePath = toAbsolute(entry.source);
+    const source = await fs.readFile(sourcePath, 'utf8');
+    const output = await generateOutput(entry, source);
+
+    return {
+      entry,
+      sizes: getCompressedSizes(output),
+      budget: getBudget(entry),
+    };
+  }));
+
+  const failures = results.filter(({ sizes, budget }) => sizes.brotli > budget);
+
+  process.stdout.write('Block brotli budgets\n');
+  results.forEach(({ entry, sizes, budget }) => {
+    const status = sizes.brotli > budget ? 'FAIL' : 'PASS';
+    process.stdout.write(
+      `${status.padEnd(4, ' ')}  ${entry.output.padEnd(40, ' ')}  ${formatBytes(sizes.brotli)} / ${formatBytes(budget)}\n`,
+    );
+  });
+
+  if (failures.length) {
+    process.stderr.write('\nBudget failures detected:\n');
+    failures.forEach(({ entry, sizes, budget }) => {
+      process.stderr.write(`- ${entry.output}: brotli ${sizes.brotli} exceeds budget ${budget}\n`);
+    });
+    process.exit(1);
+  }
+}
+
 async function main() {
   const mode = process.argv[2] || 'sync';
 
-  if (!['sync', 'check'].includes(mode)) {
-    process.stderr.write('Usage: node tools/minify-eds-assets.mjs [sync|check]\n');
+  if (!['sync', 'check', 'report', 'budget'].includes(mode)) {
+    process.stderr.write('Usage: node tools/minify-eds-assets.mjs [sync|check|report|budget]\n');
     process.exit(1);
+  }
+
+  if (mode === 'report') {
+    await reportEntries();
+    return;
+  }
+
+  if (mode === 'budget') {
+    await checkBudgets();
+    return;
   }
 
   const results = await Promise.all(MANAGED_FILES.map((entry) => syncEntry(entry, mode)));

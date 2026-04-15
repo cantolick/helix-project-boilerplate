@@ -1,11 +1,11 @@
-# EDS Minification Agent Skill
+# EDS Block Compile and Compression Skill
 
-Purpose: maintain readable `.src.js` and `.src.css` files for managed block assets in Git while generating the deployed block `.js` and `.css` files that Adobe Edge Delivery Services serves directly.
+Purpose: maintain readable `.src.js` and `.src.css` files for managed block assets in Git while compiling and compressing production `.js` and `.css` files that Adobe Edge Delivery Services serves directly.
 
 ## Repo Rules
 
 - Treat `.src.js` and `.src.css` files as the editable source of truth.
-- Treat `.js` and `.css` files covered by `agent-manifest.json` as generated deployment artifacts.
+- Treat `.js` and `.css` files covered by `agent-manifest.json` as compiled production artifacts.
 - Never edit generated output files directly.
 - Keep `agent-manifest.json` updated whenever source or output files change.
 - Keep `*.src.js`, `*.src.css`, `agent-manifest.json`, and `AGENT_SKILL.md` ignored by EDS via `.hlxignore`.
@@ -29,17 +29,20 @@ The workflow intentionally excludes upstream or third-party assets such as:
 
 ## Commands
 
-- `npm run minify` regenerates outputs and updates `agent-manifest.json`
-- `npm run minify:check` verifies source and output files are in sync
+- `npm run minify` compiles and compresses managed block outputs and updates `agent-manifest.json`
+- `npm run minify:check` verifies source and compiled output files are in sync
+- `npm run minify:report` reports raw, gzip, and brotli sizes for managed block outputs
+- `npm run minify:budget` enforces brotli performance budgets for managed block outputs
 - `npm run lint` validates readable source files
 
 ## Workflow
 
 1. Edit the relevant `.src.js` or `.src.css` file.
-2. Run `npm run minify`.
-3. Review both the source file and generated output.
-4. Run `npm run lint`.
+2. Run `npm run minify` to compile and compress the managed block outputs.
+3. Review both the source file and compiled output.
+4. Run `npm run minify:check`, `npm run minify:budget`, and `npm run lint`.
+5. Before commit, confirm the compiled block assets are regenerated and the performance budget check passes.
 
 ## Review Rule
 
-When explaining or auditing code, read the `.src.js` and `.src.css` files instead of the generated output files.
+When explaining or auditing code, read the `.src.js` and `.src.css` files instead of the compiled output files.

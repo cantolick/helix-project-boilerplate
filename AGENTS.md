@@ -46,27 +46,31 @@ Agents must treat this repo as Edge Delivery Services, not classic AEM:
 - Start local development: `npx -y @adobe/aem-cli up --no-open --forward-browser-logs` (run in background, if possible)
   - Install the AEM CLI globally by running `npm install -g @adobe/aem-cli` then `aem up` is equivalent to the command above
   - The dev server runs at `http://localhost:3000` with auto-reload. Open it in playwright, puppeteer, or a browser. If none are available, ask the human to open it and give feedback.
-- Regenerate deployed JS/CSS from source files: `npm run minify`
-- Verify generated JS/CSS is in sync with source files: `npm run minify:check`
+- Compile and compress managed block assets for production: `npm run minify`
+- Verify compiled block assets are in sync with source files: `npm run minify:check`
+- Report raw, gzip, and brotli sizes for managed block assets: `npm run minify:report`
+- Enforce brotli performance budgets for managed block assets: `npm run minify:budget`
 - Run linting before committing: `npm run lint`
 - Auto-Fix linting issues: `npm run lint:fix`
 
-## Source and Minified Asset Workflow
+## Source, Compile, and Compression Workflow
 
-This repository keeps human-readable source files and generated deployment files side by side for managed block JS and CSS tracked in `agent-manifest.json`.
+This repository keeps human-readable source files and compiled production files side by side for managed block JS and CSS tracked in `agent-manifest.json`.
 
 - Always edit `.src.js` and `.src.css` files for managed assets.
-- Never hand-edit the generated `.js` and `.css` deployment files for managed assets.
-- After any change to a managed source file, run `npm run minify` in the same task so the output file and `agent-manifest.json` are updated immediately.
-- Before claiming success on JS or CSS work, run `npm run minify:check` and `npm run lint`.
-- When reviewing or explaining code, read the `.src.js` and `.src.css` files rather than the generated outputs.
+- Never hand-edit the compiled `.js` and `.css` production files for managed assets.
+- After any change to a managed source file, run `npm run minify` in the same task so the compiled output and `agent-manifest.json` are updated immediately.
+- Before claiming success on JS or CSS work, run `npm run minify:check`, `npm run minify:budget`, and `npm run lint`.
+- Treat compiled block output size as a performance concern. Use `npm run minify:report` when comparing approaches or defending performance tradeoffs.
+- Before commit, confirm compiled block assets are regenerated and the budget check passes.
+- When reviewing or explaining code, read the `.src.js` and `.src.css` files rather than the compiled outputs.
 - Keep `*.src.js`, `*.src.css`, `agent-manifest.json`, and `AGENT_SKILL.md` excluded from Edge Delivery serving via `.hlxignore`.
 
 Managed assets currently include block files only:
 
 - `blocks/*/*.js` and `blocks/*/*.css`
 
-Do not apply this source/minified workflow to upstream or vendor assets such as:
+Do not apply this compile/compress workflow to upstream or vendor assets such as:
 
 - `scripts/**`
 - `styles/**`
@@ -83,8 +87,8 @@ Do not apply this source/minified workflow to upstream or vendor assets such as:
     └── {blockname}/   - Individual block directory
         ├── {blockname}.src.js  # Editable source JavaScript for managed assets
         ├── {blockname}.src.css # Editable source CSS for managed assets
-        ├── {blockname}.js      # Generated deployed JavaScript
-        └── {blockname}.css     # Generated deployed CSS
+        ├── {blockname}.js      # Compiled and compressed production JavaScript
+        └── {blockname}.css     # Compiled and compressed production CSS
 ├── styles/          # Global styles and CSS
     ├── styles.css          # Editable and deployed critical global styles
     ├── lazy-styles.css     # Editable and deployed deferred global styles
@@ -107,7 +111,7 @@ Do not apply this source/minified workflow to upstream or vendor assets such as:
 - Follow Airbnb ESLint rules (already configured)
 - Always include `.js` file extensions in imports
 - Use Unix line endings (LF)
-- For managed block files in `agent-manifest.json`, edit the `.src.js` source file and regenerate the deployed `.js` file with `npm run minify`
+- For managed block files in `agent-manifest.json`, edit the `.src.js` source file and compile the production `.js` file with `npm run minify`
 
 ### CSS
 - Follow Stylelint standard configuration
@@ -118,7 +122,7 @@ Do not apply this source/minified workflow to upstream or vendor assets such as:
   - Bad: `.item-list`
   - Good: `.{blockname} .item-list`   
 - Avoid classes `{blockname}-container` and `{blockname}-wrapper` as those are used on sections and could be confusing.
-- For managed block files in `agent-manifest.json`, edit the `.src.css` source file and regenerate the deployed `.css` file with `npm run minify`
+- For managed block files in `agent-manifest.json`, edit the `.src.css` source file and compile the production `.css` file with `npm run minify`
 
 ### HTML
 - Use semantic HTML5 elements
@@ -164,7 +168,7 @@ Use `curl` and `console.log` to inspect the HTML delivered by the backend and th
 
 Each block should be self-contained and re-useable, with CSS and JS files following the naming convention: `blockname.css`, `blockname.js`. Blocks should be responsive and accessible by default.
 
-In this repository, if the block is part of the managed asset set, the editable files are `blockname.src.js` and `blockname.src.css`, and the deployed `blockname.js` and `blockname.css` files must be regenerated from them before the task is complete.
+In this repository, if the block is part of the managed asset set, the editable files are `blockname.src.js` and `blockname.src.css`, and the production `blockname.js` and `blockname.css` files must be compiled from them before the task is complete.
 
 ### Block Registration Requirement
 
@@ -195,6 +199,7 @@ Pages are progressively loaded in three phases to maximize performance. This pro
 - Images uploaded by authors are automatically optimized, all images and assets committed to git must be optimized and checked for size
 - Use lazy loading for non-critical resources (`lazy-styles.css` and `delayed.js`)
 - Minimize JavaScript bundle size by avoiding dependencies, using automatic code splitting provided by `/blocks/`
+- For managed block assets, treat compile/compress output size and brotli budget compliance as part of the performance review
 
 ### Accessibility
 - Ensure proper heading hierarchy
@@ -276,7 +281,7 @@ Agents must follow a structured workflow for all non-trivial tasks.
 - Make minimal, scoped changes
 - Follow block conventions strictly
 - If a new block is added, register it in `component-definition.json`, `component-models.json`, and `component-filters.json` when the block should be authorable
-- If a managed JS or CSS file changes, edit the `.src` file, regenerate the deployed output with `npm run minify`, and update `agent-manifest.json` in the same task
+- If a managed JS or CSS file changes, edit the `.src` file, compile/compress the production output with `npm run minify`, and update `agent-manifest.json` in the same task
 
 ### Step 4: Review
 - Validate:
@@ -284,6 +289,8 @@ Agents must follow a structured workflow for all non-trivial tasks.
   - performance impact
   - accessibility
   - `npm run minify:check` passes for managed JS/CSS assets
+  - `npm run minify:budget` passes for managed JS/CSS assets
+  - compiled block assets are ready before commit
 
 ### Step 5: Reflect
 - Ask: "Is this understandable by both humans and AI agents?"

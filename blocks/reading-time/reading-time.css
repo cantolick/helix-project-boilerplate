@@ -1,1 +1,1 @@
-.reading-time{margin:0 0 1rem}.reading-time .reading-time-value{color:var(--brand-heading-color);font-size:var(--body-font-size-xs);font-weight:600;line-height:1.4;margin:0}@media(width>= 900px){.reading-time{max-width:300px;width:100%}}
+.reading-time{margin:0 0 1rem}.reading-time .reading-time-value{color:var(--brand-heading-color);font-size:var(--body-font-size-xs);margin:0;font-weight:600;line-height:1.4}@media (width>=900px){.reading-time{width:100%;max-width:300px}}
