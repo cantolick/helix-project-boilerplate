@@ -96,10 +96,14 @@ Use the Adobe AEM CLI as the default local runtime for Edge Delivery validation 
    - `curl http://localhost:3000/<path>.md`
    - Prefer existing authored pages that already use the real content source
    - Use `drafts/` only as a local fallback when no authored page exists for validation
-5. Define the authored content contract in plain language
-6. Implement the smallest change that fits that contract
+5. Plan rendered validation:
+   - Prefer `agent-browser` or Playwright for post-implementation DOM, console, and interaction checks
+   - Use `curl` and source inspection to understand authored input and server-delivered markup
+6. Define the authored content contract in plain language
+7. Implement the smallest change that fits that contract
    - If the task adds a new authored block, register it in `component-definition.json`, `component-models.json`, and `component-filters.json` as part of the same change
-7. Validate with the local dev server and query/index output when relevant
+8. Validate with the local dev server and query/index output when relevant
+   - Prefer browser automation for rendered validation when available
 
 ## Multi-Agent Preference
 
