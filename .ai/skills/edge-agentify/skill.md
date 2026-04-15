@@ -30,6 +30,12 @@ For EDS questions, prefer Adobe sources before coding:
    - `https://www.aem.live/developer/ai-coding-agents`
    - `https://www.aem.live/developer/cli-reference`
 
+After Adobe guidance and local repo inspection:
+
+- Use `helix-mcp` when it is available and can provide EDS-aware block, page-status, or RUM context faster than manual research
+- Use `Context7` only for fresh third-party or library documentation that is not covered by Adobe docs or the repository
+- Keep Adobe docs as the architectural source of truth for Edge Delivery decisions
+
 ## AEM CLI Reference
 
 Use the Adobe AEM CLI as the default local runtime for Edge Delivery validation in this repo.
@@ -77,28 +83,30 @@ Use the Adobe AEM CLI as the default local runtime for Edge Delivery validation 
 ## Workflow
 
 1. Read the relevant Adobe doc pages for the task
-2. Inspect the local implementation:
+2. If the task needs additional references, use `.ai/skills/reference-sourcing/skill.md` to decide whether `helix-mcp` or `Context7` should be used
+3. Inspect the local implementation:
    - block files
    - `scripts/scripts.js`
    - `component-definition.json`, `component-models.json`, and `component-filters.json` when adding or exposing authored blocks
    - `helix-query.yaml` or metadata files when relevant
-3. Inspect real content shape before coding:
+4. Inspect real content shape before coding:
    - Start or confirm the AEM CLI local server if localhost is needed for validation
    - `curl http://localhost:3000/<path>`
    - `curl http://localhost:3000/<path>.plain.html`
    - `curl http://localhost:3000/<path>.md`
    - Prefer existing authored pages that already use the real content source
    - Use `drafts/` only as a local fallback when no authored page exists for validation
-4. Define the authored content contract in plain language
-5. Implement the smallest change that fits that contract
+5. Define the authored content contract in plain language
+6. Implement the smallest change that fits that contract
    - If the task adds a new authored block, register it in `component-definition.json`, `component-models.json`, and `component-filters.json` as part of the same change
-6. Validate with the local dev server and query/index output when relevant
+7. Validate with the local dev server and query/index output when relevant
 
 ## Multi-Agent Preference
 
 For non-trivial EDS work, prefer splitting the task across the available Edge agents instead of keeping all reasoning in one context.
 
 - `Edge Planner` for authored structure, DOM contract, validation plan, and file inventory
+- `Reference Scout` for source selection and tool routing when the task depends on external references
 - `Edge Implementer` for code changes, block wiring, and component registration
 - `AI Agent Consumer` for AI-readable clarity and JSON fidelity checks
 - `Edge Reviewer` for regression review, missing validation, and risky assumptions
