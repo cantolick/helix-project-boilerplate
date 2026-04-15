@@ -1,0 +1,32 @@
+#!/bin/sh
+
+set -eu
+
+ROOT_DIR=$(git rev-parse --show-toplevel)
+cd "$ROOT_DIR"
+
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR)
+
+if [ -z "$STAGED_FILES" ]; then
+  exit 0
+fi
+
+needs_block_compile=0
+
+for file in $STAGED_FILES; do
+  case "$file" in
+    blocks/*/*.src.js|blocks/*/*.src.css|blocks/*/*.js|blocks/*/*.css|agent-manifest.json|tools/minify-eds-assets.mjs|package.json|package-lock.json)
+      needs_block_compile=1
+      break
+      ;;
+  esac
+done
+
+if [ "$needs_block_compile" -eq 1 ]; then
+  echo "pre-commit: compiling and compressing managed block assets"
+  npm run minify
+  git add agent-manifest.json blocks
+fi
+
+echo "pre-commit: verifying managed block outputs, budgets, and lint"
+npm run precommit:verify
