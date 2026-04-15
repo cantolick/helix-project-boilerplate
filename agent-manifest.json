@@ -255,6 +255,24 @@
       "output": "blocks/skills/skills.css",
       "description": "skills block styles.",
       "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "table-script",
+      "type": "js",
+      "block": "table",
+      "source": "blocks/table/table.src.js",
+      "output": "blocks/table/table.js",
+      "description": "table block behavior.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "table-styles",
+      "type": "css",
+      "block": "table",
+      "source": "blocks/table/table.src.css",
+      "output": "blocks/table/table.css",
+      "description": "table block styles.",
+      "lastMinified": "2026-04-15"
     }
   ]
 }

@@ -27,6 +27,7 @@ const MANAGED_FILES = [
     'reading-time',
     'related-posts',
     'skills',
+    'table',
   ].flatMap((blockName) => ([
     {
       id: `${blockName}-script`,

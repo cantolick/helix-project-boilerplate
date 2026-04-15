@@ -17,12 +17,19 @@
       "entry",
       "experience",
       "hero",
+      "table",
       "cards",
       "columns",
       "fragment",
       "map",
       "reading-time",
       "skills"
+    ]
+  },
+  {
+    "id": "table",
+    "components": [
+      "table-row"
     ]
   },
   {

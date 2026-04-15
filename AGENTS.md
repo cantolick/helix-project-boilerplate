@@ -23,6 +23,14 @@ Required starting points:
 - `https://www.aem.live/llms.txt`
 - `https://www.aem.live/developer/ai-coding-agents`
 
+Reference order for agent work in this repo:
+1. Adobe documentation on `www.aem.live`
+2. Repo-local instructions and skills in `AGENTS.md`, `AGENT_SKILL.md`, and `.ai/skills/`
+3. `helix-mcp` when available for EDS-aware docs, block inventory, page status, and RUM-oriented inspection
+4. `Context7` when fresh third-party or library documentation is needed after checking Adobe guidance first
+
+Use auxiliary references to improve speed and accuracy, not to override Adobe guidance or local repo rules.
+
 Prefer Adobe sources over memory or generic web results. Unless the user asks otherwise, restrict web research to `www.aem.live`.
 
 When choosing docs, prefer:
@@ -52,6 +60,22 @@ Agents must treat this repo as Edge Delivery Services, not classic AEM:
 - Enforce brotli performance budgets for managed block assets: `npm run minify:budget`
 - Run linting before committing: `npm run lint`
 - Auto-Fix linting issues: `npm run lint:fix`
+
+## Recommended Local Tools For Agents
+
+Adobe recommends installing a few command-line tools that make AI-assisted development faster and more reliable. They are optional, but useful in this repo:
+
+- `rg` (ripgrep) for fast codebase search
+- `jq` for JSON inspection and transformation
+- `gh` for GitHub and PR workflows
+- `curl` for local preview, `.plain.html`, and docs inspection
+- `sg` (ast-grep) for syntax-aware search and transformations
+- `http` (HTTPie) for human-friendly HTTP requests
+- `fzf` for fuzzy selection
+- `fd` for fast file discovery
+- `bat` for readable file output
+
+These tools improve the agent workflow, but they do not change the managed block compile/compress workflow or the pre-commit requirements in this repo.
 
 ## Source, Compile, and Compression Workflow
 
@@ -371,6 +395,7 @@ Agents should use:
 
 - edge-agentify → when modifying blocks, metadata, indexing, or content structure
 - local-validate → after implementation and before claiming success
+- reference-sourcing → when deciding whether Adobe docs, `helix-mcp`, or `Context7` is the right source for the task
 
 If a skill conflicts with Adobe documentation, follow Adobe documentation and update the skill later.
 
@@ -380,6 +405,7 @@ For non-trivial Edge Delivery tasks, prefer specialized subagents over doing all
 
 Use this split when the task includes a new block, changes authored content structure, alters indexing or metadata, or needs AI-readable output review.
 
+- `Reference Scout` → confirm the best source order for the task, prefer Adobe docs first, then route to `helix-mcp` or `Context7` only when they add value
 - `Edge Planner` → define the authored content contract, expected DOM, required file changes, and validation path
 - `Edge Implementer` → make the code and authoring configuration changes
 - `AI Agent Consumer` → check whether the rendered result is understandable to an AI consumer and whether any JSON mirrors visible content correctly
