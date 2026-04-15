@@ -12,6 +12,7 @@ const MANAGED_FILES = [
   ...[
     'blogfeed',
     'cards',
+    'code',
     'columns',
     'entry',
     'experience',

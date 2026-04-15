@@ -278,6 +278,49 @@
     ]
   },
   {
+    "id": "code",
+    "fields": [
+      {
+        "component": "text",
+        "name": "title",
+        "label": "Title",
+        "valueType": "string",
+        "value": ""
+      },
+      {
+        "component": "select",
+        "name": "language",
+        "label": "Language",
+        "valueType": "string",
+        "options": [
+          {
+            "name": "JavaScript",
+            "value": "js"
+          },
+          {
+            "name": "CSS",
+            "value": "css"
+          },
+          {
+            "name": "HTML",
+            "value": "html"
+          },
+          {
+            "name": "Markdown",
+            "value": "md"
+          }
+        ]
+      },
+      {
+        "component": "text-area",
+        "name": "code",
+        "label": "Code",
+        "valueType": "string",
+        "value": ""
+      }
+    ]
+  },
+  {
     "id": "columns",
     "fields": [
       {
