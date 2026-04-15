@@ -225,6 +225,79 @@
     ]
   },
   {
+    "id": "table",
+    "fields": [
+      {
+        "component": "text",
+        "name": "caption",
+        "label": "Caption",
+        "valueType": "string",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "name": "fileHeader",
+        "label": "File Header",
+        "valueType": "string",
+        "value": "File"
+      },
+      {
+        "component": "text",
+        "name": "minifyHeader",
+        "label": "Minify Header",
+        "valueType": "string",
+        "value": "Minify"
+      },
+      {
+        "component": "text",
+        "name": "mainHeader",
+        "label": "Main Header",
+        "valueType": "string",
+        "value": "Main"
+      },
+      {
+        "component": "text",
+        "name": "deltaHeader",
+        "label": "Delta Header",
+        "valueType": "string",
+        "value": "Delta"
+      }
+    ]
+  },
+  {
+    "id": "table-row",
+    "fields": [
+      {
+        "component": "text",
+        "name": "file",
+        "label": "File",
+        "valueType": "string",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "name": "minify",
+        "label": "Minify",
+        "valueType": "string",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "name": "main",
+        "label": "Main",
+        "valueType": "string",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "name": "delta",
+        "label": "Delta",
+        "valueType": "string",
+        "value": ""
+      }
+    ]
+  },
+  {
     "id": "blogfeed",
     "fields": [
       {
@@ -274,6 +347,49 @@
         "value": "",
         "label": "Text",
         "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "code",
+    "fields": [
+      {
+        "component": "text",
+        "name": "title",
+        "label": "Title",
+        "valueType": "string",
+        "value": ""
+      },
+      {
+        "component": "select",
+        "name": "language",
+        "label": "Language",
+        "valueType": "string",
+        "options": [
+          {
+            "name": "JavaScript",
+            "value": "js"
+          },
+          {
+            "name": "CSS",
+            "value": "css"
+          },
+          {
+            "name": "HTML",
+            "value": "html"
+          },
+          {
+            "name": "Markdown",
+            "value": "md"
+          }
+        ]
+      },
+      {
+        "component": "text-area",
+        "name": "code",
+        "label": "Code",
+        "valueType": "string",
+        "value": ""
       }
     ]
   },

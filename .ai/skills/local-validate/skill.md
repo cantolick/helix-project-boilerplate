@@ -7,6 +7,8 @@ description: Use after Edge Delivery Services changes to validate real local out
 
 Use this skill after block, rendering, metadata, or indexing changes.
 
+This skill validates rendered output locally. It can be complemented by `helix-mcp` for page-status or RUM context, but live MCP data does not replace local DOM inspection.
+
 ## AEM CLI Capabilities
 
 Assume the Adobe AEM CLI is the primary local validation tool.

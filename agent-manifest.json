@@ -1,0 +1,278 @@
+{
+  "version": "1.0",
+  "description": "Agent-only registry for EDS source/output file pairs. Do not deploy.",
+  "lastUpdated": "2026-04-15",
+  "updatedBy": "agent",
+  "files": [
+    {
+      "id": "blogfeed-script",
+      "type": "js",
+      "block": "blogfeed",
+      "source": "blocks/blogfeed/blogfeed.src.js",
+      "output": "blocks/blogfeed/blogfeed.js",
+      "description": "blogfeed block behavior.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "blogfeed-styles",
+      "type": "css",
+      "block": "blogfeed",
+      "source": "blocks/blogfeed/blogfeed.src.css",
+      "output": "blocks/blogfeed/blogfeed.css",
+      "description": "blogfeed block styles.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "cards-script",
+      "type": "js",
+      "block": "cards",
+      "source": "blocks/cards/cards.src.js",
+      "output": "blocks/cards/cards.js",
+      "description": "cards block behavior.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "cards-styles",
+      "type": "css",
+      "block": "cards",
+      "source": "blocks/cards/cards.src.css",
+      "output": "blocks/cards/cards.css",
+      "description": "cards block styles.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "code-script",
+      "type": "js",
+      "block": "code",
+      "source": "blocks/code/code.src.js",
+      "output": "blocks/code/code.js",
+      "description": "code block behavior.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "code-styles",
+      "type": "css",
+      "block": "code",
+      "source": "blocks/code/code.src.css",
+      "output": "blocks/code/code.css",
+      "description": "code block styles.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "columns-script",
+      "type": "js",
+      "block": "columns",
+      "source": "blocks/columns/columns.src.js",
+      "output": "blocks/columns/columns.js",
+      "description": "columns block behavior.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "columns-styles",
+      "type": "css",
+      "block": "columns",
+      "source": "blocks/columns/columns.src.css",
+      "output": "blocks/columns/columns.css",
+      "description": "columns block styles.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "entry-script",
+      "type": "js",
+      "block": "entry",
+      "source": "blocks/entry/entry.src.js",
+      "output": "blocks/entry/entry.js",
+      "description": "entry block behavior.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "entry-styles",
+      "type": "css",
+      "block": "entry",
+      "source": "blocks/entry/entry.src.css",
+      "output": "blocks/entry/entry.css",
+      "description": "entry block styles.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "experience-script",
+      "type": "js",
+      "block": "experience",
+      "source": "blocks/experience/experience.src.js",
+      "output": "blocks/experience/experience.js",
+      "description": "experience block behavior.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "experience-styles",
+      "type": "css",
+      "block": "experience",
+      "source": "blocks/experience/experience.src.css",
+      "output": "blocks/experience/experience.css",
+      "description": "experience block styles.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "footer-script",
+      "type": "js",
+      "block": "footer",
+      "source": "blocks/footer/footer.src.js",
+      "output": "blocks/footer/footer.js",
+      "description": "footer block behavior.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "footer-styles",
+      "type": "css",
+      "block": "footer",
+      "source": "blocks/footer/footer.src.css",
+      "output": "blocks/footer/footer.css",
+      "description": "footer block styles.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "fragment-script",
+      "type": "js",
+      "block": "fragment",
+      "source": "blocks/fragment/fragment.src.js",
+      "output": "blocks/fragment/fragment.js",
+      "description": "fragment block behavior.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "fragment-styles",
+      "type": "css",
+      "block": "fragment",
+      "source": "blocks/fragment/fragment.src.css",
+      "output": "blocks/fragment/fragment.css",
+      "description": "fragment block styles.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "header-script",
+      "type": "js",
+      "block": "header",
+      "source": "blocks/header/header.src.js",
+      "output": "blocks/header/header.js",
+      "description": "header block behavior.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "header-styles",
+      "type": "css",
+      "block": "header",
+      "source": "blocks/header/header.src.css",
+      "output": "blocks/header/header.css",
+      "description": "header block styles.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "hero-script",
+      "type": "js",
+      "block": "hero",
+      "source": "blocks/hero/hero.src.js",
+      "output": "blocks/hero/hero.js",
+      "description": "hero block behavior.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "hero-styles",
+      "type": "css",
+      "block": "hero",
+      "source": "blocks/hero/hero.src.css",
+      "output": "blocks/hero/hero.css",
+      "description": "hero block styles.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "map-script",
+      "type": "js",
+      "block": "map",
+      "source": "blocks/map/map.src.js",
+      "output": "blocks/map/map.js",
+      "description": "map block behavior.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "map-styles",
+      "type": "css",
+      "block": "map",
+      "source": "blocks/map/map.src.css",
+      "output": "blocks/map/map.css",
+      "description": "map block styles.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "reading-time-script",
+      "type": "js",
+      "block": "reading-time",
+      "source": "blocks/reading-time/reading-time.src.js",
+      "output": "blocks/reading-time/reading-time.js",
+      "description": "reading-time block behavior.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "reading-time-styles",
+      "type": "css",
+      "block": "reading-time",
+      "source": "blocks/reading-time/reading-time.src.css",
+      "output": "blocks/reading-time/reading-time.css",
+      "description": "reading-time block styles.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "related-posts-script",
+      "type": "js",
+      "block": "related-posts",
+      "source": "blocks/related-posts/related-posts.src.js",
+      "output": "blocks/related-posts/related-posts.js",
+      "description": "related-posts block behavior.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "related-posts-styles",
+      "type": "css",
+      "block": "related-posts",
+      "source": "blocks/related-posts/related-posts.src.css",
+      "output": "blocks/related-posts/related-posts.css",
+      "description": "related-posts block styles.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "skills-script",
+      "type": "js",
+      "block": "skills",
+      "source": "blocks/skills/skills.src.js",
+      "output": "blocks/skills/skills.js",
+      "description": "skills block behavior.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "skills-styles",
+      "type": "css",
+      "block": "skills",
+      "source": "blocks/skills/skills.src.css",
+      "output": "blocks/skills/skills.css",
+      "description": "skills block styles.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "table-script",
+      "type": "js",
+      "block": "table",
+      "source": "blocks/table/table.src.js",
+      "output": "blocks/table/table.js",
+      "description": "table block behavior.",
+      "lastMinified": "2026-04-15"
+    },
+    {
+      "id": "table-styles",
+      "type": "css",
+      "block": "table",
+      "source": "blocks/table/table.src.css",
+      "output": "blocks/table/table.css",
+      "description": "table block styles.",
+      "lastMinified": "2026-04-15"
+    }
+  ]
+}

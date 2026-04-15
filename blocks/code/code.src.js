@@ -1,0 +1,127 @@
+const COPY_LABEL = 'Copy';
+const COPIED_LABEL = 'Copied';
+const LANGUAGE_LABELS = {
+  js: 'JavaScript',
+  javascript: 'JavaScript',
+  css: 'CSS',
+  html: 'HTML',
+  md: 'Markdown',
+  markdown: 'Markdown',
+};
+
+function normalizeLanguage(value = '') {
+  return value.trim().toLowerCase();
+}
+
+function getLanguageLabel(language) {
+  return LANGUAGE_LABELS[language] || (language ? language.toUpperCase() : '');
+}
+
+function getBlockData(block) {
+  const rows = [...block.querySelectorAll(':scope > div')];
+  const data = {};
+  let simpleCode = '';
+
+  rows.forEach((row) => {
+    const columns = [...row.children];
+    if (columns.length < 2) {
+      if (!simpleCode) {
+        simpleCode = row.textContent || '';
+      }
+      return;
+    }
+
+    const key = columns[0].textContent.trim().toLowerCase();
+    const value = columns[1].textContent || '';
+
+    data[key] = value.trimEnd();
+  });
+
+  return {
+    title: data.title?.trim() || '',
+    language: normalizeLanguage(data.language),
+    code: data.code || simpleCode.trimEnd(),
+  };
+}
+
+async function copyCode(button, code) {
+  try {
+    await navigator.clipboard.writeText(code);
+    button.textContent = COPIED_LABEL;
+    window.setTimeout(() => {
+      button.textContent = COPY_LABEL;
+    }, 2000);
+  } catch (error) {
+    button.textContent = 'Copy failed';
+    window.setTimeout(() => {
+      button.textContent = COPY_LABEL;
+    }, 2000);
+  }
+}
+
+function buildHeader(title, language, code) {
+  const header = document.createElement('figcaption');
+  header.className = 'code-block-header';
+
+  const meta = document.createElement('div');
+  meta.className = 'code-block-meta';
+
+  if (title) {
+    const titleElement = document.createElement('span');
+    titleElement.className = 'code-block-title';
+    titleElement.textContent = title;
+    meta.append(titleElement);
+  }
+
+  if (language) {
+    const badge = document.createElement('span');
+    badge.className = 'code-block-language';
+    badge.textContent = getLanguageLabel(language);
+    meta.append(badge);
+  }
+
+  const button = document.createElement('button');
+  button.className = 'code-block-copy';
+  button.type = 'button';
+  button.textContent = COPY_LABEL;
+  button.setAttribute('aria-label', `Copy ${getLanguageLabel(language) || 'code'} snippet`);
+  button.addEventListener('click', () => {
+    copyCode(button, code);
+  });
+
+  header.append(meta, button);
+  return header;
+}
+
+function buildCodeElement(language, code) {
+  const pre = document.createElement('pre');
+  pre.className = 'code-block-pre';
+
+  const codeElement = document.createElement('code');
+  codeElement.className = 'code-block-code';
+  if (language) {
+    codeElement.classList.add(`language-${language}`);
+    codeElement.dataset.language = language;
+  }
+  codeElement.textContent = code;
+
+  pre.append(codeElement);
+  return pre;
+}
+
+export default function decorate(block) {
+  const { title, language, code } = getBlockData(block);
+
+  if (!code.trim()) {
+    block.remove();
+    return;
+  }
+
+  const figure = document.createElement('figure');
+  figure.className = 'code-block-figure';
+
+  const header = buildHeader(title, language, code);
+  figure.append(header);
+  figure.append(buildCodeElement(language, code));
+  block.replaceChildren(figure);
+}

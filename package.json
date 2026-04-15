@@ -4,10 +4,17 @@
   "version": "1.3.0",
   "description": "Starter project for Adobe Helix",
   "scripts": {
-    "lint:js": "eslint .",
-    "lint:css": "stylelint \"blocks/**/*.css\" \"styles/*.css\"",
+    "prepare": "node ./tools/install-git-hooks.mjs",
+    "hooks:install": "node ./tools/install-git-hooks.mjs",
+    "lint:js": "eslint \"blocks/**/*.src.js\" \"scripts/*.js\" \"plugins/**/*.js\" \"tools/**/*.mjs\"",
+    "lint:css": "stylelint \"blocks/**/*.src.css\" \"styles/*.css\" \"plugins/**/*.css\"",
     "lint": "npm run lint:js && npm run lint:css",
-    "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix"
+    "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix",
+    "minify": "node ./tools/minify-eds-assets.mjs sync",
+    "minify:check": "node ./tools/minify-eds-assets.mjs check",
+    "minify:report": "node ./tools/minify-eds-assets.mjs report",
+    "minify:budget": "node ./tools/minify-eds-assets.mjs budget",
+    "precommit:verify": "npm run minify:check && npm run minify:budget && npm run lint"
   },
   "repository": {
     "type": "git",
@@ -24,7 +31,9 @@
     "eslint": "8.57.1",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-plugin-import": "2.32.0",
+    "lightningcss": "^1.32.0",
     "stylelint": "17.6.0",
-    "stylelint-config-standard": "40.0.0"
+    "stylelint-config-standard": "40.0.0",
+    "terser": "^5.46.1"
   }
 }
