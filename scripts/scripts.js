@@ -148,6 +148,57 @@ function buildAutoBlocks(main) {
   }
 }
 
+function normalizeEsiTables(main) {
+  const normalizeKey = (value = '') => value.trim().toLowerCase().replace(/[\s-]/g, '');
+
+  const isEsiTable = (table) => {
+    const firstCell = table.querySelector('tr:first-of-type th, tr:first-of-type td');
+    return normalizeKey(firstCell?.textContent || '') === 'esi';
+  };
+
+  const tables = Array.from(main.querySelectorAll('table')).filter((table) => isEsiTable(table));
+  if (tables.length === 0) return;
+
+  loadCSS(`${window.hlx.codeBasePath}/blocks/esi/esi.css`);
+  import('../blocks/esi/esi.js').then(({ default: decorateEsiBlock }) => {
+    tables.forEach((table) => {
+      const config = {};
+      table.querySelectorAll('tr').forEach((row) => {
+        const cells = row.querySelectorAll('th, td');
+        if (cells.length < 2) return;
+        const key = normalizeKey(cells[0].textContent || '');
+        if (key === 'esi') return;
+
+        const link = cells[1].querySelector('a[href]');
+        const value = link ? link.getAttribute('href') : (cells[1].textContent || '').trim();
+        if (!value) return;
+        config[key] = value;
+      });
+
+      if (!config.embedpath) return;
+
+      const esiBlock = document.createElement('div');
+      esiBlock.className = 'esi';
+
+      ['embedpath', 'selector', 'fallbackmessage'].forEach((key) => {
+        if (!config[key]) return;
+        const row = document.createElement('div');
+        const keyCell = document.createElement('div');
+        const valueCell = document.createElement('div');
+        keyCell.textContent = key;
+        valueCell.textContent = config[key];
+        row.append(keyCell, valueCell);
+        esiBlock.append(row);
+      });
+
+      table.replaceWith(esiBlock);
+      decorateEsiBlock(esiBlock);
+    });
+  }).catch(() => {
+    // If block module import fails, leave authored table markup unchanged.
+  });
+}
+
 /**
  * Decorates the main element.
  * @param {Element} main The main element
@@ -158,6 +209,7 @@ export function decorateMain(main) {
   decorateButtons(main);
   decorateIcons(main);
   buildAutoBlocks(main);
+  normalizeEsiTables(main);
   decorateSections(main);
   decorateBlocks(main);
 }

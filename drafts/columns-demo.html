@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Columns Block Demo</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+    <script src="/scripts/aem.js" type="module"></script>
+</head>
+<body>
+    <header></header>
+    <main>
+        <div>
+            <h1>Columns Block Demo</h1>
+            <p>This page demonstrates the 2-column layout that renders side-by-side on desktop.</p>
+            
+            <div class="columns">
+                <div>
+                    <div>
+                        <h2>Left Column</h2>
+                        <p>This is the left column content. On desktop (900px+), this appears side-by-side with the right column. On mobile, it stacks vertically.</p>
+                        <p>You can add multiple paragraphs, headings, lists, and other content here.</p>
+                    </div>
+                    <div>
+                        <h2>Right Column</h2>
+                        <p>This is the right column content. Both columns have equal flex: 1 width at 900px+, with a 32px gap between them.</p>
+                        <p>Images in columns are handled specially with the columns-img-col class.</p>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <h2>How to Author This in Google Docs</h2>
+            <p>Create a table with 2 columns and fill in your content:</p>
+            <table>
+                <tr>
+                    <th>Column</th>
+                    <th>Column</th>
+                </tr>
+                <tr>
+                    <td>Left content</td>
+                    <td>Right content</td>
+                </tr>
+            </table>
+        </div>
+    </main>
+    <footer></footer>
+    <script src="/scripts/scripts.js" type="module"></script>
+</body>
+</html>

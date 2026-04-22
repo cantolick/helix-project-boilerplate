@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Columns Authoring Example</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+    <script src="/scripts/aem.js" type="module"></script>
+</head>
+<body>
+    <header></header>
+    <main>
+        <div>
+            <h1>How to Author Columns in Google Docs</h1>
+            
+            <h2>Step-by-Step Instructions</h2>
+            <ol>
+                <li>In your Google Doc, create a <strong>new row</strong> where you want columns</li>
+                <li>In the first cell of that row, type: <code>Columns</code></li>
+                <li>Create a <strong>table with 2 columns and 2 rows</strong>:
+                    <ul>
+                        <li><strong>Row 1:</strong> Header cells (can say "Column" or be descriptive like "Features" / "Benefits")</li>
+                        <li><strong>Row 2:</strong> Your actual content for left and right columns</li>
+                    </ul>
+                </li>
+                <li>Publish your page - the columns will render side-by-side on desktop</li>
+            </ol>
+
+            <hr>
+
+            <h2>Live Example: Features vs Benefits</h2>
+            
+            <div class="columns">
+                <div>
+                    <div>
+                        <h3>Features</h3>
+                        <ul>
+                            <li>Fast performance</li>
+                            <li>Easy to author</li>
+                            <li>Mobile responsive</li>
+                            <li>SEO optimized</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Benefits</h3>
+                        <ul>
+                            <li>Authors love the simplicity</li>
+                            <li>Readers see great content</li>
+                            <li>Crawlers index everything</li>
+                            <li>Fast page loads</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <h2>Another Example: Before & After</h2>
+            
+            <div class="columns">
+                <div>
+                    <div>
+                        <h3>Before</h3>
+                        <p>Your content used to require complex CSS and custom styling. Authors had to understand HTML and technical details.</p>
+                        <p>Pages were hard to maintain and update.</p>
+                    </div>
+                    <div>
+                        <h3>After</h3>
+                        <p>Now authors just create a simple table in Google Docs. No HTML knowledge needed.</p>
+                        <p>Columns render automatically with perfect responsive behavior on any device.</p>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <h2>Example with Images</h2>
+            
+            <div class="columns">
+                <div>
+                    <picture>
+                        <source srcset="https://via.placeholder.com/400x300?text=Left+Image" media="(min-width: 900px)">
+                        <img src="https://via.placeholder.com/300x300?text=Left+Image" alt="Left column image">
+                    </picture>
+                    <div>
+                        <h3>Image + Text</h3>
+                        <p>You can put images in one column and text in the other.</p>
+                    </div>
+                 </div>
+                <div>
+                    <div>
+                        <h3>Text Column</h3>
+                        <p>Images get special styling with the columns-img-col class for optimal display.</p>
+                        <p>The layout automatically adjusts for mobile devices.</p>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <h2>Google Doc Markup</h2>
+            <p>When you author columns in Google Docs, the markup looks like this:</p>
+            <pre><code>Columns
+
+| Column | Column |
+|--------|--------|
+| Left content | Right content |</code></pre>
+
+            <p><strong>AEM converts this to HTML</strong> and your block decorator handles the responsive styling.</p>
+        </div>
+    </main>
+    <footer></footer>
+    <script src="/scripts/scripts.js" type="module"></script>
+</body>
+</html>
