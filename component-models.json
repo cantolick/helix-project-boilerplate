@@ -437,6 +437,37 @@
     ]
   },
   {
+    "id": "esi",
+    "fields": [
+      {
+        "component": "text",
+        "name": "embedPath",
+        "label": "Embed Path",
+        "valueType": "string"
+      },
+      {
+        "component": "text",
+        "name": "selector",
+        "label": "Selector",
+        "valueType": "string"
+      },
+      {
+        "component": "text",
+        "name": "proxyPath",
+        "label": "Proxy Path",
+        "valueType": "string",
+        "value": "/api/esi-fragment"
+      },
+      {
+        "component": "text",
+        "name": "fallbackMessage",
+        "label": "Fallback Message",
+        "valueType": "string",
+        "value": "Embedded content is unavailable right now."
+      }
+    ]
+  },
+  {
     "id": "fragment",
     "fields": [
       {
