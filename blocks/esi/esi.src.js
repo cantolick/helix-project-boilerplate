@@ -7,21 +7,27 @@
  * On preview servers, we show a visual placeholder so authors can see where
  * ESI substitution will occur.
  */
-export default function decorate(block) {
-  // Extract config from the block table
+function normalizeKey(key = '') {
+  return key.trim().toLowerCase().replace(/[\s-]/g, '');
+}
+
+export function extractEsiConfig(block) {
   const rows = Array.from(block.querySelectorAll(':scope > div'));
   const config = {};
 
   rows.forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
     if (cells.length === 2) {
-      const key = cells[0].textContent.trim().toLowerCase();
+      const key = normalizeKey(cells[0].textContent);
       const value = cells[1].textContent.trim();
       config[key] = value;
     }
   });
 
-  // Create a visual preview container
+  return config;
+}
+
+export function createEsiPreview(config = {}) {
   const preview = document.createElement('div');
   preview.className = 'esi-preview';
 
@@ -71,8 +77,18 @@ export default function decorate(block) {
   footer.textContent = 'This placeholder appears only on preview. On production, the Cloudflare Worker fetches and inlines the fragment.';
   preview.appendChild(footer);
 
-  // Replace the block table with the preview
+  return preview;
+}
+
+export function renderEsiPreview(block, config = {}) {
+  const preview = createEsiPreview(config);
+
   block.innerHTML = '';
   block.appendChild(preview);
   block.classList.add('esi-decorated');
+}
+
+export default function decorate(block) {
+  const config = extractEsiConfig(block);
+  renderEsiPreview(block, config);
 }

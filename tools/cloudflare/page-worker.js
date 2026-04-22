@@ -57,76 +57,159 @@ async function fetchWithTimeout(urlStr, ms) {
 }
 
 /**
- * Phase 1 — scan the page HTML, stamp each `.esi` block with a unique
- * `data-esi-id` attribute, and collect its embedPath + selector config
- * from the EDS two-column block table structure.
+ * Phase 0 — pre-mark raw ESI tables that appear nested inside other EDS blocks
+ * (e.g. inside a columns block). EDS renders those as plain <table> elements
+ * with no `.esi` class, because the block JS hasn't run yet. We detect them by
+ * their header cell text ("esi") and add a `data-esi-table` attribute so the
+ * HTMLRewriter in Phase 1 can select them alongside top-level `.esi` divs.
  *
- * EDS block table shape (before JS decoration):
+ * Input pattern (after EDS renders to HTML, before JS runs):
+ *   <table>
+ *     <thead><tr><th colspan="2">esi</th></tr></thead>
+ *     <tbody>
+ *       <tr><td>embedPath</td><td>https://…</td></tr>
+ *       <tr><td>fallbackMessage</td><td>…</td></tr>
+ *     </tbody>
+ *   </table>
+ */
+function preMarkEsiTables(html) {
+  // Match common EDS table shapes where the table identifies itself as "esi":
+  // 1) thead > tr > th = "esi"
+  // 2) first tbody row first cell = "esi"
+  // We add data-esi-table to the <table> opening tag in both cases.
+  const withTheadMarked = html.replace(
+    /(<table(?:[^>]*)>)((?:\s|<!--.*?-->)*<thead(?:[^>]*)>(?:\s|<!--.*?-->)*<tr(?:[^>]*)>(?:\s|<!--.*?-->)*<th(?:[^>]*)>\s*esi\s*<\/th>)/gis,
+    (match, tableTag, rest) => {
+      if (tableTag.includes('data-esi-table')) return match;
+      return tableTag.replace('<table', '<table data-esi-table') + rest;
+    },
+  );
+
+  return withTheadMarked.replace(
+    /(<table(?:[^>]*)>)((?:\s|<!--.*?-->)*<tbody(?:[^>]*)>(?:\s|<!--.*?-->)*<tr(?:[^>]*)>(?:\s|<!--.*?-->)*(?:<t[dh](?:[^>]*)>\s*esi\s*<\/t[dh]>))/gis,
+    (match, tableTag, rest) => {
+      if (tableTag.includes('data-esi-table')) return match;
+      return tableTag.replace('<table', '<table data-esi-table') + rest;
+    },
+  );
+}
+
+/**
+ * Phase 1 — scan the page HTML, stamp each `.esi` block (div format) and each
+ * ESI table (pre-marked with data-esi-table) with a unique `data-esi-id`
+ * attribute, and collect embedPath / selector / fallbackMessage config.
+ *
+ * Two supported shapes:
+ *
+ * A) Top-level EDS block div (class="esi"):
  *   <div class="esi">
- *     <div>                      ← row
- *       <div>embedPath</div>     ← key cell  (cellIndex 1)
- *       <div><a href="…">…</a></div>  ← value cell (cellIndex 2)
- *     </div>
- *     <div>
- *       <div>selector</div>
- *       <div>.hero-banner</div>
- *     </div>
+ *     <div><div>embedPath</div><div><a href="…">…</a></div></div>
+ *     <div><div>selector</div><div>.hero-banner</div></div>
  *   </div>
  *
+ * B) Nested inside another block (rendered as a raw table):
+ *   <table data-esi-table>
+ *     <thead><tr><th>esi</th></tr></thead>
+ *     <tbody>
+ *       <tr><td>embedPath</td><td>https://…</td></tr>
+ *       <tr><td>selector</td><td>.hero-banner</td></tr>
+ *     </tbody>
+ *   </table>
+ *
  * Cloudflare HTMLRewriter does not support :nth-child(), so cell position is
- * tracked with a counter reset on each row.
+ * tracked via a shared counter reset on each row boundary.
  */
-async function markAndCollect(html) {
+async function markAndCollect(rawHtml) {
+  // Pre-pass: add data-esi-table to any ESI tables nested inside other blocks.
+  const html = preMarkEsiTables(rawHtml);
+
   const blocks = [];
   let currentBlock = null;
   let cellIndex = 0;
   let keyText = '';
 
+  function onBlock(block) {
+    currentBlock = block;
+    blocks.push(block);
+    cellIndex = 0;
+    keyText = '';
+  }
+
+  function onRow() {
+    cellIndex = 0;
+    keyText = '';
+  }
+
+  function onCellStart() {
+    cellIndex += 1;
+  }
+
+  function onCellText(text) {
+    if (cellIndex === 1) {
+      keyText += text;
+      return;
+    }
+    if (cellIndex !== 2 || !currentBlock) return;
+    const key = keyText.trim().toLowerCase().replace(/[\s-]/g, '');
+    if (key === 'selector') currentBlock.selector += text;
+    if (key === 'fallbackmessage') currentBlock.fallbackMessage += text;
+    if (key === 'embedpath') currentBlock.embedPath += text;
+  }
+
+  function onAnchor(href) {
+    if (!currentBlock || cellIndex !== 2) return;
+    const key = keyText.trim().toLowerCase().replace(/[\s-]/g, '');
+    // Prefer the href over the text node value for embedPath (handles link formatting)
+    if (key === 'embedpath' && href) currentBlock.embedPath = href;
+  }
+
   const markedHtml = await new HTMLRewriter()
+    // ── Format A: top-level .esi div blocks ──────────────────────────────────
     .on('.esi', {
       element(el) {
         const id = `esi${blocks.length}`;
         el.setAttribute('data-esi-id', id);
-        currentBlock = {
-          id,
-          embedPath: '',
-          selector: '',
-          fallbackMessage: '',
-        };
-        blocks.push(currentBlock);
-        cellIndex = 0;
-        keyText = '';
+        onBlock({
+          id, embedPath: '', selector: '', fallbackMessage: '',
+        });
       },
     })
     .on('.esi > div', {
-      element() {
-        cellIndex = 0;
-        keyText = '';
-      },
+      element() { onRow(); },
     })
     .on('.esi > div > div', {
-      element() {
-        cellIndex += 1;
-      },
-      text({ text }) {
-        if (cellIndex === 1) {
-          keyText += text;
-          return;
-        }
-        if (cellIndex !== 2 || !currentBlock) return;
-        const key = keyText.trim().toLowerCase().replace(/[\s-]/g, '');
-        if (key === 'selector') currentBlock.selector += text;
-        if (key === 'fallbackmessage') currentBlock.fallbackMessage += text;
-      },
+      element() { onCellStart(); },
+      text({ text }) { onCellText(text); },
     })
     .on('.esi > div > div a', {
+      element(el) { onAnchor(el.getAttribute('href') || ''); },
+    })
+    // ── Format B: ESI tables pre-marked with data-esi-table ──────────────────
+    .on('[data-esi-table]', {
       element(el) {
-        if (!currentBlock || cellIndex !== 2) return;
-        const key = keyText.trim().toLowerCase().replace(/[\s-]/g, '');
-        if (key === 'embedpath' && !currentBlock.embedPath) {
-          currentBlock.embedPath = el.getAttribute('href') || '';
-        }
+        const id = `esi${blocks.length}`;
+        el.setAttribute('data-esi-id', id);
+        onBlock({
+          id, embedPath: '', selector: '', fallbackMessage: '',
+        });
       },
+    })
+    .on('[data-esi-table] tr', {
+      element() { onRow(); },
+    })
+    .on('[data-esi-table] tr td', {
+      element() { onCellStart(); },
+      text({ text }) { onCellText(text); },
+    })
+    .on('[data-esi-table] tr th', {
+      element() { onCellStart(); },
+      text({ text }) { onCellText(text); },
+    })
+    .on('[data-esi-table] tr td a', {
+      element(el) { onAnchor(el.getAttribute('href') || ''); },
+    })
+    .on('[data-esi-table] tr th a', {
+      element(el) { onAnchor(el.getAttribute('href') || ''); },
     })
     .transform(new Response(html))
     .text();
@@ -136,6 +219,8 @@ async function markAndCollect(html) {
     block.selector = block.selector.trim();
     // eslint-disable-next-line no-param-reassign
     block.fallbackMessage = block.fallbackMessage.trim();
+    // eslint-disable-next-line no-param-reassign
+    block.embedPath = block.embedPath.trim();
   });
 
   return { blocks, markedHtml };

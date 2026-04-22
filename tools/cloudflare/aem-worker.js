@@ -418,73 +418,130 @@ async function fetchWithTimeout(urlStr, ms) {
 }
 
 /**
- * Phase 1 — scan the page HTML, stamp each `.esi` block with a unique
- * `data-esi-id` attribute, and collect its embedPath + selector config
- * from the EDS two-column block table structure.
+ * Phase 0 — pre-mark raw ESI tables that appear nested inside other EDS blocks
+ * (e.g. inside columns). Nested ESI authored content can be rendered as plain
+ * <table> markup before client-side decoration runs, so we tag those tables for
+ * robust worker-side parsing.
  */
-async function markAndCollect(html) {
+function preMarkEsiTables(html) {
+  const withTheadMarked = html.replace(
+    /(<table(?:[^>]*)>)((?:\s|<!--.*?-->)*<thead(?:[^>]*)>(?:\s|<!--.*?-->)*<tr(?:[^>]*)>(?:\s|<!--.*?-->)*<th(?:[^>]*)>\s*esi\s*<\/th>)/gis,
+    (match, tableTag, rest) => {
+      if (tableTag.includes('data-esi-table')) return match;
+      return tableTag.replace('<table', '<table data-esi-table') + rest;
+    },
+  );
+
+  return withTheadMarked.replace(
+    /(<table(?:[^>]*)>)((?:\s|<!--.*?-->)*<tbody(?:[^>]*)>(?:\s|<!--.*?-->)*<tr(?:[^>]*)>(?:\s|<!--.*?-->)*(?:<t[dh](?:[^>]*)>\s*esi\s*<\/t[dh]>))/gis,
+    (match, tableTag, rest) => {
+      if (tableTag.includes('data-esi-table')) return match;
+      return tableTag.replace('<table', '<table data-esi-table') + rest;
+    },
+  );
+}
+
+/**
+ * Phase 1 — scan the page HTML, stamp each `.esi` block with a unique
+ * `data-esi-id` attribute, and collect embedPath / selector / fallbackMessage
+ * config from both standard .esi block divs and nested ESI table variants.
+ */
+async function markAndCollect(rawHtml) {
+  const html = preMarkEsiTables(rawHtml);
+
   const blocks = [];
   let currentBlock = null;
   let cellIndex = 0;
   let keyText = '';
+
+  function onBlock(block) {
+    currentBlock = block;
+    blocks.push(block);
+    cellIndex = 0;
+    keyText = '';
+  }
+
+  function onRow() {
+    cellIndex = 0;
+    keyText = '';
+  }
+
+  function onCellText(text) {
+    if (cellIndex === 1) {
+      keyText += text;
+      return;
+    }
+
+    if (cellIndex !== 2 || !currentBlock) return;
+
+    const key = keyText.trim().toLowerCase().replace(/[\s-]/g, '');
+    if (key === 'selector') currentBlock.selector += text;
+    if (key === 'fallbackmessage') currentBlock.fallbackMessage += text;
+    if (key === 'embedpath') currentBlock.embedPath += text;
+  }
+
+  function onAnchor(href) {
+    if (!currentBlock || cellIndex !== 2) return;
+    const key = keyText.trim().toLowerCase().replace(/[\s-]/g, '');
+    if (key === 'embedpath' && href) currentBlock.embedPath = href;
+  }
 
   const markedHtml = await new HTMLRewriter()
     .on('.esi', {
       element(el) {
         const id = `esi${blocks.length}`;
         el.setAttribute('data-esi-id', id);
-        currentBlock = {
+        onBlock({
           id,
           embedPath: '',
           selector: '',
           fallbackMessage: '',
-        };
-        blocks.push(currentBlock);
-        cellIndex = 0;
-        keyText = '';
+        });
       },
     })
     .on('.esi > div', {
-      element() {
-        // Finalize previous row before resetting: lock embedPathText once
-        // the first embedpath row is complete so a duplicate row doesn't append.
-        if (currentBlock && cellIndex > 0) {
-          const prevKey = keyText.trim().toLowerCase().replace(/[\s-]/g, '');
-          if (prevKey === 'embedpath' && currentBlock.embedPathText) {
-            currentBlock.embedPathDone = true;
-          }
-        }
-        cellIndex = 0;
-        keyText = '';
-      },
+      element() { onRow(); },
     })
     .on('.esi > div > div', {
-      element() {
-        cellIndex += 1;
-      },
-      text({ text }) {
-        if (cellIndex === 1) {
-          keyText += text;
-          return;
-        }
-        if (cellIndex !== 2 || !currentBlock) return;
-        const key = keyText.trim().toLowerCase().replace(/[\s-]/g, '');
-        if (key === 'selector') currentBlock.selector += text;
-        if (key === 'fallbackmessage') currentBlock.fallbackMessage += text;
-        // Capture plain-text URLs; skip if first embedpath row already completed
-        if (key === 'embedpath' && !currentBlock.embedPath && !currentBlock.embedPathDone) {
-          currentBlock.embedPathText = (currentBlock.embedPathText || '') + text;
-        }
-      },
+      element() { cellIndex += 1; },
+      text({ text }) { onCellText(text); },
     })
     .on('.esi > div > div a', {
       element(el) {
-        if (!currentBlock || cellIndex !== 2) return;
-        const key = keyText.trim().toLowerCase().replace(/[\s-]/g, '');
-        if (key === 'embedpath' && !currentBlock.embedPath) {
-          // Hyperlinked value takes priority over plain text
-          currentBlock.embedPath = el.getAttribute('href') || '';
-        }
+        onAnchor(el.getAttribute('href') || '');
+      },
+    })
+    .on('[data-esi-table]', {
+      element(el) {
+        const id = `esi${blocks.length}`;
+        el.setAttribute('data-esi-id', id);
+        onBlock({
+          id,
+          embedPath: '',
+          selector: '',
+          fallbackMessage: '',
+        });
+      },
+    })
+    .on('[data-esi-table] tr', {
+      element() { onRow(); },
+    })
+    .on('[data-esi-table] tr td', {
+      element() { cellIndex += 1; },
+      text({ text }) { onCellText(text); },
+    })
+    .on('[data-esi-table] tr th', {
+      element() { cellIndex += 1; },
+      text({ text }) { onCellText(text); },
+    })
+    .on('[data-esi-table] tr td a', {
+      element(el) {
+        onAnchor(el.getAttribute('href') || '');
+      },
+    })
+    .on('[data-esi-table] tr th a', {
+      element(el) {
+        onAnchor(el.getAttribute('href') || '');
       },
     })
     .transform(new Response(html))
@@ -495,11 +552,8 @@ async function markAndCollect(html) {
     block.selector = block.selector.trim();
     // eslint-disable-next-line no-param-reassign
     block.fallbackMessage = block.fallbackMessage.trim();
-    // Prefer <a href> value; fall back to plain-text URL
-    if (!block.embedPath && block.embedPathText) {
-      // eslint-disable-next-line no-param-reassign
-      block.embedPath = block.embedPathText.trim();
-    }
+    // eslint-disable-next-line no-param-reassign
+    block.embedPath = block.embedPath.trim();
   });
 
   return { blocks, markedHtml };

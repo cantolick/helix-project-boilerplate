@@ -27,6 +27,12 @@ Notes:
 3. It wraps each successful fragment in an `eds-embed` web component and replaces the block before the response is sent.
 4. The browser never receives the `.esi` block markup — it sees the substituted content directly.
 
+Nested placement support:
+
+- ESI blocks authored inside containers like Columns may be rendered by EDS as raw HTML tables before block JS runs.
+- The worker now detects nested ESI tables whether they use a `<thead><th>esi</th></thead>` marker or a first-row `esi` marker in `<tbody>`.
+- This allows the same substitution behavior whether the ESI block is top-level in a section or nested inside another block/container.
+
 The `eds-embed` component moves the fragment into Shadow DOM so embed CSS (e.g. `* { margin: 0 }`) does not leak into the host page.
 
 Fragment sources must be listed in `ALLOWED_EMBED_HOSTS`. Requests to unlisted hosts are rejected with a 403.
