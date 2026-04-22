@@ -22,6 +22,14 @@ const DEFAULT_TIMEOUT_MS = 5000;
 const FRAG_START = '<!--esi-s-->';
 const FRAG_END = '<!--esi-e-->';
 
+function escapeHtml(str = '') {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 function parseAllowedHosts(env) {
   return (env.ALLOWED_EMBED_HOSTS || '')
     .split(',')
@@ -79,7 +87,12 @@ async function markAndCollect(html) {
       element(el) {
         const id = `esi${blocks.length}`;
         el.setAttribute('data-esi-id', id);
-        currentBlock = { id, embedPath: '', selector: '' };
+        currentBlock = {
+          id,
+          embedPath: '',
+          selector: '',
+          fallbackMessage: '',
+        };
         blocks.push(currentBlock);
         cellIndex = 0;
         keyText = '';
@@ -103,6 +116,7 @@ async function markAndCollect(html) {
         if (cellIndex !== 2 || !currentBlock) return;
         const key = keyText.trim().toLowerCase().replace(/[\s-]/g, '');
         if (key === 'selector') currentBlock.selector += text;
+        if (key === 'fallbackmessage') currentBlock.fallbackMessage += text;
       },
     })
     .on('.esi > div > div a', {
@@ -120,6 +134,8 @@ async function markAndCollect(html) {
   blocks.forEach((block) => {
     // eslint-disable-next-line no-param-reassign
     block.selector = block.selector.trim();
+    // eslint-disable-next-line no-param-reassign
+    block.fallbackMessage = block.fallbackMessage.trim();
   });
 
   return { blocks, markedHtml };
@@ -199,24 +215,34 @@ function wrapFragment(html) {
  * Phase 2 — replace each marked `.esi` block with its fetched fragment HTML wrapped in web component.
  * Blocks whose fetch failed are left in place so the client-side JS fallback can still attempt them.
  */
-function substitute(markedHtml, blockContents) {
+function substitute(markedHtml, blockContents, blockConfigById) {
   let rewriter = new HTMLRewriter();
+  let hasWrappedEmbeds = false;
 
   blockContents.forEach((fragmentHtml, id) => {
-    if (!fragmentHtml) return;
+    const blockConfig = blockConfigById.get(id);
+    if (!fragmentHtml && !blockConfig?.fallbackMessage) return;
+
     rewriter = rewriter.on(`[data-esi-id="${id}"]`, {
       element(el) {
-        el.replace(wrapFragment(fragmentHtml), { html: true });
+        if (fragmentHtml) {
+          hasWrappedEmbeds = true;
+          el.replace(wrapFragment(fragmentHtml), { html: true });
+          return;
+        }
+
+        el.replace(`<div data-esi-fallback>${escapeHtml(blockConfig.fallbackMessage)}</div>`, { html: true });
       },
     });
   });
 
-  // Inject the eds-embed custom element bootstrap
-  rewriter = rewriter.on('body', {
-    element(el) {
-      el.append(EDS_EMBED_SCRIPT, { html: true });
-    },
-  });
+  if (hasWrappedEmbeds) {
+    rewriter = rewriter.on('body', {
+      element(el) {
+        el.append(EDS_EMBED_SCRIPT, { html: true });
+      },
+    });
+  }
 
   return rewriter.transform(new Response(markedHtml, { headers: { 'content-type': 'text/html' } }));
 }
@@ -246,6 +272,7 @@ export default {
 
     const pageHtml = await pageResponse.text();
     const { blocks, markedHtml } = await markAndCollect(pageHtml);
+    const blockConfigById = new Map(blocks.map((b) => [b.id, b]));
 
     if (blocks.length === 0) {
       return new Response(pageHtml, {
@@ -259,7 +286,7 @@ export default {
     );
     const blockContents = new Map(entries);
 
-    const transformed = substitute(markedHtml, blockContents);
+    const transformed = substitute(markedHtml, blockContents, blockConfigById);
 
     const responseHeaders = new Headers(pageResponse.headers);
     responseHeaders.delete('content-encoding');

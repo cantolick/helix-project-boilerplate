@@ -1,1 +1,53 @@
-/* intentionally empty — esi block is rendered server-side by the Cloudflare page worker */
+.esi {
+  background: var(--surface-secondary-color);
+  border: 1px solid var(--border-soft-color);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  font-family: var(--body-font-family);
+}
+
+.esi-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.esi-preview-title {
+  font-size: var(--body-font-size-xs);
+  font-weight: 600;
+  color: var(--brand-heading-color);
+}
+
+.esi-preview-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted-strong-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 8px;
+}
+
+.esi-preview-path,
+.esi-preview-selector {
+  display: block;
+  font-size: 12px;
+  color: var(--text-color);
+  background: var(--surface-color);
+  border: 1px solid var(--border-light-color);
+  border-radius: 4px;
+  padding: 8px;
+  margin-top: 4px;
+  overflow-x: auto;
+  word-break: break-all;
+  font-family: var(--fixed-font-family);
+}
+
+.esi-preview-footer {
+  font-size: 11px;
+  color: var(--text-muted-color);
+  font-style: italic;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-light-color);
+  margin-top: 8px;
+}
