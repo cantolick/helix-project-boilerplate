@@ -18,6 +18,7 @@ const MANAGED_FILES = [
     'code',
     'columns',
     'entry',
+    'esi',
     'experience',
     'footer',
     'fragment',
@@ -54,6 +55,7 @@ const DEFAULT_BUDGETS = {
   css: 500,
 };
 const BUDGET_OVERRIDES = {
+  'blocks/esi/esi.js': 1400,
   'blocks/blogfeed/blogfeed.js': 1600,
   'blocks/blogfeed/blogfeed.css': 1100,
   'blocks/code/code.js': 700,
