@@ -54,6 +54,18 @@ export default function decorate(block) {
     preview.appendChild(selectorValue);
   }
 
+  if (config.fallbackmessage) {
+    const fallbackLabel = document.createElement('div');
+    fallbackLabel.className = 'esi-preview-label';
+    fallbackLabel.textContent = 'Fallback Message:';
+    preview.appendChild(fallbackLabel);
+
+    const fallbackValue = document.createElement('div');
+    fallbackValue.className = 'esi-preview-fallback';
+    fallbackValue.textContent = config.fallbackmessage;
+    preview.appendChild(fallbackValue);
+  }
+
   const footer = document.createElement('div');
   footer.className = 'esi-preview-footer';
   footer.textContent = 'This placeholder appears only on preview. On production, the Cloudflare Worker fetches and inlines the fragment.';
