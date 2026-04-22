@@ -43,6 +43,19 @@
   font-family: var(--fixed-font-family);
 }
 
+.esi-preview-fallback {
+  display: block;
+  font-size: 12px;
+  color: #5d4037;
+  background: #fbe9e7;
+  border: 1px solid #d7ccc8;
+  border-left: 4px solid #ff6f00;
+  border-radius: 4px;
+  padding: 8px;
+  margin-top: 4px;
+  overflow-wrap: break-word;
+}
+
 .esi-preview-footer {
   font-size: 11px;
   color: var(--text-muted-color);
