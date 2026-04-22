@@ -433,7 +433,12 @@ async function markAndCollect(html) {
       element(el) {
         const id = `esi${blocks.length}`;
         el.setAttribute('data-esi-id', id);
-        currentBlock = { id, embedPath: '', selector: '' };
+        currentBlock = {
+          id,
+          embedPath: '',
+          selector: '',
+          fallbackMessage: '',
+        };
         blocks.push(currentBlock);
         cellIndex = 0;
         keyText = '';
@@ -465,6 +470,7 @@ async function markAndCollect(html) {
         if (cellIndex !== 2 || !currentBlock) return;
         const key = keyText.trim().toLowerCase().replace(/[\s-]/g, '');
         if (key === 'selector') currentBlock.selector += text;
+        if (key === 'fallbackmessage') currentBlock.fallbackMessage += text;
         // Capture plain-text URLs; skip if first embedpath row already completed
         if (key === 'embedpath' && !currentBlock.embedPath && !currentBlock.embedPathDone) {
           currentBlock.embedPathText = (currentBlock.embedPathText || '') + text;
@@ -487,6 +493,8 @@ async function markAndCollect(html) {
   blocks.forEach((block) => {
     // eslint-disable-next-line no-param-reassign
     block.selector = block.selector.trim();
+    // eslint-disable-next-line no-param-reassign
+    block.fallbackMessage = block.fallbackMessage.trim();
     // Prefer <a href> value; fall back to plain-text URL
     if (!block.embedPath && block.embedPathText) {
       // eslint-disable-next-line no-param-reassign
@@ -587,26 +595,36 @@ function buildEdsEmbedScriptTag(nonce) {
  * Blocks whose fetch failed are left in place so the client-side JS fallback
  * in esi.js can still attempt them.
  */
-function substituteEsi(markedHtml, blockContents, headers, status) {
+function substituteEsi(markedHtml, blockContents, blockConfigById, headers, status) {
   const cspNonce = getCspNonce(headers);
   let rewriter = new HTMLRewriter();
+  let hasWrappedEmbeds = false;
 
   blockContents.forEach((fragmentHtml, id) => {
-    if (!fragmentHtml) return;
+    const blockConfig = blockConfigById.get(id);
+    if (!fragmentHtml && !blockConfig?.fallbackMessage) return;
+
     rewriter = rewriter.on(`[data-esi-id="${id}"]`, {
       element(el) {
-        el.replace(wrapFragment(fragmentHtml), { html: true });
+        if (fragmentHtml) {
+          hasWrappedEmbeds = true;
+          el.replace(wrapFragment(fragmentHtml), { html: true });
+          return;
+        }
+
+        el.replace(`<div data-esi-fallback>${escapeHtml(blockConfig.fallbackMessage)}</div>`, { html: true });
       },
     });
   });
 
-  // Always inject the custom element bootstrap when blocks are substituted
-  const scriptTag = buildEdsEmbedScriptTag(cspNonce);
-  rewriter = rewriter.on('body', {
-    element(el) {
-      el.append(scriptTag, { html: true });
-    },
-  });
+  if (hasWrappedEmbeds) {
+    const scriptTag = buildEdsEmbedScriptTag(cspNonce);
+    rewriter = rewriter.on('body', {
+      element(el) {
+        el.append(scriptTag, { html: true });
+      },
+    });
+  }
 
   return rewriter.transform(new Response(markedHtml, { status, headers }));
 }
@@ -736,11 +754,12 @@ const handleRequest = async (request, env, ctx) => {
     // Step 2: ESI server-side block substitution
     const { blocks, markedHtml } = await markAndCollect(html);
     if (blocks.length > 0) {
+      const blockConfigById = new Map(blocks.map((b) => [b.id, b]));
       const esiEntries = await Promise.all(
         blocks.map(async (b) => [b.id, await fetchFragment(b, request.url, env)]),
       );
       const blockContents = new Map(esiEntries);
-      return substituteEsi(markedHtml, blockContents, mutHeaders, fetchedResp.status);
+      return substituteEsi(markedHtml, blockContents, blockConfigById, mutHeaders, fetchedResp.status);
     }
 
     // No ESI blocks — return blogfeed-processed (or unchanged) HTML

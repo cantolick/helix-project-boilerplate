@@ -23,7 +23,7 @@ Notes:
 ### On `www` (Cloudflare Worker)
 
 1. The Worker scans the EDS-rendered HTML for `.esi` blocks.
-2. For each block it records the embed path and selector.
+2. For each block it records the embed path, selector, and fallback message.
 3. It wraps each successful fragment in an `eds-embed` web component and replaces the block before the response is sent.
 4. The browser never receives the `.esi` block markup — it sees the substituted content directly.
 
@@ -31,9 +31,9 @@ The `eds-embed` component moves the fragment into Shadow DOM so embed CSS (e.g. 
 
 Fragment sources must be listed in `ALLOWED_EMBED_HOSTS`. Requests to unlisted hosts are rejected with a 403.
 
-### On `aem.page` / Local Dev (Client-Side Fallback)
+### On `aem.page` / Local Dev (Client-Side Preview)
 
-The `esi` block JavaScript runs client-side on preview environments that bypass the Worker. In this case the block removes itself so the page renders cleanly. Full server-side substitution only runs through the Cloudflare Worker route.
+The `esi` block JavaScript runs client-side on preview environments that bypass the Worker. In this case it renders a themed placeholder card so authors can see where the fragment will be substituted. Full server-side substitution only runs through the Cloudflare Worker route.
 
 ## Why Not Literal `<esi:include>`
 
