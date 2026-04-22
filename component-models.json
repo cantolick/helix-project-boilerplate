@@ -453,13 +453,6 @@
       },
       {
         "component": "text",
-        "name": "proxyPath",
-        "label": "Proxy Path",
-        "valueType": "string",
-        "value": "/api/esi-fragment"
-      },
-      {
-        "component": "text",
         "name": "fallbackMessage",
         "label": "Fallback Message",
         "valueType": "string",
