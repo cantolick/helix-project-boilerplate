@@ -42,6 +42,21 @@
   white-space: nowrap;
 }
 
+/* author variant: name the block "Table (wrap)" for prose-heavy tables
+   instead of the default wide numeric-table scroll behavior.
+   table-layout: fixed forces columns to share the 100% width instead of
+   growing to fit content, which is what actually stops mobile overflow */
+.table.wrap table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.table.wrap th,
+.table.wrap td {
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
 .table tbody tr:nth-child(even) td,
 .table tbody tr:nth-child(even) th {
   background: color-mix(in srgb, var(--highlight-background-color) 35%, white);
