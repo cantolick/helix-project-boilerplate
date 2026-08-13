@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "aem-drafts",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "@adobe/aem-cli", "up", "--no-open", "--html-folder", "drafts"],
+      "port": 3000
+    }
+  ]
+}

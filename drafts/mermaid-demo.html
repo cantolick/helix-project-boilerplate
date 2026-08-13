@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Mermaid Block Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="/scripts/scripts.js" type="module"></script>
+  <link rel="stylesheet" href="/styles/styles.css">
+  <link rel="stylesheet" href="/styles/lazy-styles.css">
+</head>
+<body>
+  <header></header>
+  <main>
+    <div class="section">
+      <h1>Mermaid Block Demo</h1>
+      <p>The diagram below is authored as plain mermaid text and rendered client-side. The mermaid library only loads when the block approaches the viewport.</p>
+      <div class="mermaid">
+        <div>
+          <div>title</div>
+          <div>Customer outcomes measurement flow</div>
+        </div>
+        <div>
+          <div>code</div>
+          <div>
+            <p>flowchart TD</p>
+            <p>    A["Customer goals&lt;br/&gt;Revenue • qualified leads • self-service • loyalty"]</p>
+            <p>    B["AEM Sites + Edge Delivery Services&lt;br/&gt;Owned content • pages • structured data • delivery"]</p>
+            <p>    P["Semrush AI/search intelligence&lt;br/&gt;Prompts • mentions • citations • competitors"]</p>
+            <p>    L["CDN log forwarding&lt;br/&gt;AI agents • crawlers • referral traffic"]</p>
+            <p>    C1["AEM Operational Telemetry&lt;br/&gt;Sampled page-performance signals"]</p>
+            <p>    C2["Web instrumentation&lt;br/&gt;Platform Web SDK • Tags • GA4"]</p>
+            <p>    C3["Brand Concierge&lt;br/&gt;Widget or SDK • conversation events"]</p>
+            <p>    D["Adobe Brand Visibility&lt;br/&gt;AI visibility • prompt monitoring • referral traffic"]</p>
+            <p>    E["AEM Sites Optimizer&lt;br/&gt;Audits • opportunities • recommendations • fixes"]</p>
+            <p>    F["Adobe Analytics / GA4 / CJA&lt;br/&gt;Web engagement • conversion • commerce"]</p>
+            <p>    G["Brand Concierge analytics / CJA&lt;br/&gt;Conversation • feedback • intent • handoff"]</p>
+            <p>    H["Discovery outcomes&lt;br/&gt;Brand Visibility • Share of Voice • mentions • citations"]</p>
+            <p>    I["Experience outcomes&lt;br/&gt;Core Web Vitals • accessibility • SEO • site health"]</p>
+            <p>    J["Digital outcomes&lt;br/&gt;Visits • clicks • carts • orders • revenue"]</p>
+            <p>    K["Conversation outcomes&lt;br/&gt;Engagement • completion • satisfaction • conversion"]</p>
+            <p>    M["Customer Outcomes scorecard"]</p>
+            <p>    N["Prioritize content, technical fixes, and concierge tuning"]</p>
+            <p>    A --&gt; B</p>
+            <p>    P --&gt; D</p>
+            <p>    L --&gt; D</p>
+            <p>    B --&gt; C1</p>
+            <p>    B --&gt; C2</p>
+            <p>    B --&gt; C3</p>
+            <p>    B --&gt; G</p>
+            <p>    C1 --&gt; E</p>
+            <p>    C2 --&gt; F</p>
+            <p>    C3 --&gt; G</p>
+            <p>    D --&gt; H</p>
+            <p>    E --&gt; I</p>
+            <p>    F --&gt; J</p>
+            <p>    G --&gt; K</p>
+            <p>    H --&gt; M</p>
+            <p>    I --&gt; M</p>
+            <p>    J --&gt; M</p>
+            <p>    K --&gt; M</p>
+            <p>    M --&gt; N</p>
+            <p>    N --&gt; B</p>
+            <p>    N --&gt; P</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer></footer>
+</body>
+</html>
