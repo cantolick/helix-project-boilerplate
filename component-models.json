@@ -102,7 +102,7 @@
         "valueType": "string",
         "name": "json-ld",
         "label": "JSON-LD",
-        "description": "Paste a JSON-LD object (Article, BlogPosting, Person, etc.). EDS renders this server-side as <script type=\"application/ld+json\"> in the page <head> — visible to crawlers and LLMs without JavaScript execution."
+        "description": "Paste a JSON-LD object (Article, BlogPosting, Person, etc.). EDS renders this server-side as <script type=\"application/ld+json\"> in the page <head> \u2014 visible to crawlers and LLMs without JavaScript execution."
       }
     ]
   },
@@ -388,6 +388,25 @@
         "component": "text-area",
         "name": "code",
         "label": "Code",
+        "valueType": "string",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "mermaid",
+    "fields": [
+      {
+        "component": "text",
+        "name": "title",
+        "label": "Title",
+        "valueType": "string",
+        "value": ""
+      },
+      {
+        "component": "text-area",
+        "name": "code",
+        "label": "Diagram Definition (Mermaid)",
         "valueType": "string",
         "value": ""
       }
