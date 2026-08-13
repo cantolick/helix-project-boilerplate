@@ -25,6 +25,7 @@ const MANAGED_FILES = [
     'header',
     'hero',
     'map',
+    'mermaid',
     'reading-time',
     'related-posts',
     'skills',
@@ -63,6 +64,7 @@ const BUDGET_OVERRIDES = {
   'blocks/header/header.css': 950,
   'blocks/map/map.js': 2300,
   'blocks/map/map.css': 850,
+  'blocks/mermaid/mermaid.js': 900,
   'blocks/related-posts/related-posts.js': 950,
 };
 

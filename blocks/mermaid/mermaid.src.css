@@ -1,0 +1,49 @@
+.mermaid .mermaid-figure {
+  margin: 0;
+}
+
+.mermaid .mermaid-diagram {
+  overflow-x: auto;
+  min-height: 120px;
+}
+
+/* authored source doubles as the pre-render placeholder; once the SVG is in,
+   keep it in the DOM for machine consumers but out of the visual flow */
+.mermaid .mermaid-fallback {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f8f8f8;
+  font-size: var(--body-font-size-xs, 14px);
+  line-height: 1.4;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.mermaid.mermaid-rendered .mermaid-fallback {
+  display: none;
+}
+
+.mermaid .mermaid-canvas svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.mermaid .mermaid-caption {
+  margin-top: 8px;
+  text-align: center;
+  font-size: var(--body-font-size-xs, 14px);
+  color: #505050;
+}
+
+.mermaid.mermaid-error .mermaid-error-note {
+  margin: 0 0 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background-color: #fdecea;
+  color: #8a1f11;
+  font-size: var(--body-font-size-xs, 14px);
+}
