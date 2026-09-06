@@ -1,0 +1,143 @@
+mqtt:
+  enabled: false
+
+go2rtc:
+  streams:
+    doorbell:
+      - rtsp://admin:Wyb7!s3tEZv67ZRnaK@192.168.1.237:554/h264Preview_01_main
+    doorbell_sub:
+      - rtsp://admin:Wyb7!s3tEZv67ZRnaK@192.168.1.237:554/h264Preview_01_sub
+  # garage and backyard are bridged through the neolink container (see
+  # docker-compose.yml + neolink.toml) since the E1 and Argus 3 Pro don't
+  # support RTSP directly. Verify these exact paths against neolink's
+  # startup log the first time it runs -- path naming has changed across
+  # neolink versions, so treat this as a starting point, not gospel.
+  garage:
+    - rtsp://neolink:8554/garage
+  garage_sub:
+    - rtsp://neolink:8554/garageSub
+  backyard:
+    - rtsp://neolink:8554/backyard
+  backyard_sub:
+    - rtsp://neolink:8554/backyardSub
+
+ffmpeg:
+hwaccel_args: preset-vaapi
+
+detectors:
+ov:
+  type: openvino
+  device: GPU
+
+model:
+width: 300
+height: 300
+input_tensor: nhwc
+input_pixel_format: bgr
+path: /openvino-model/ssdlite_mobilenet_v2.xml
+labelmap_path: /openvino-model/coco_91cl_bkgr.txt
+
+cameras:
+doorbell:
+  ffmpeg:
+    inputs:
+      - path: rtsp://127.0.0.1:8554/doorbell?video=copy&audio=aac
+        roles:
+          - record
+      - path: rtsp://127.0.0.1:8554/doorbell_sub
+        roles:
+          - detect
+  detect:
+    enabled: true
+    width: 640
+    height: 480
+    fps: 5
+  record:
+    enabled: true
+    continuous:
+      days: 3
+    alerts:
+      retain:
+        days: 30
+        mode: motion
+    detections:
+      retain:
+        days: 14
+        mode: motion
+  objects:
+    track:
+      - person
+      - car
+
+garage:
+  ffmpeg:
+    inputs:
+      - path: rtsp://127.0.0.1:8554/garage?video=copy&audio=aac
+        input_args: preset-rtsp-udp
+        roles:
+          - record
+      - path: rtsp://127.0.0.1:8554/garage_sub
+        input_args: preset-rtsp-udp
+        roles:
+          - detect
+  detect:
+    enabled: true
+    width: 640
+    height: 480
+    fps: 5
+  record:
+    enabled: true
+    # Neolink can't guarantee a gapless feed the way a wired camera can,
+    # so "continuous" here really means "continuous while connected."
+    continuous:
+      days: 3
+    alerts:
+      retain:
+        days: 30
+        mode: motion
+    detections:
+      retain:
+        days: 14
+        mode: motion
+  objects:
+    track:
+      - person
+      - car
+
+backyard:
+  ffmpeg:
+    inputs:
+      - path: rtsp://127.0.0.1:8554/backyard?video=copy&audio=aac
+        input_args: preset-rtsp-udp
+        roles:
+          - record
+      - path: rtsp://127.0.0.1:8554/backyard_sub
+        input_args: preset-rtsp-udp
+        roles:
+          - detect
+  detect:
+    enabled: true
+    width: 640
+    height: 480
+    fps: 5
+  record:
+    enabled: true
+    # Battery/solar camera via Neolink: this will NOT be true 24/7
+    # continuous coverage. It sleeps, wakes on PIR motion, and takes
+    # several seconds to establish the RTSP connection each time. Expect
+    # gaps around fast events, similar to what happened with the flag.
+    continuous:
+      days: 3
+    alerts:
+      retain:
+        days: 30
+        mode: motion
+    detections:
+      retain:
+        days: 14
+        mode: motion
+  objects:
+    track:
+      - person
+      - car
+      - dog

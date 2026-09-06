@@ -105,6 +105,32 @@ export function decorateButtons(main) {
 }
 
 /**
+ * Opens external links and PDFs in a new tab. EDS relativizes same-site
+ * links on publish, so anything still absolute to another host is external.
+ * @param {Element} main The container element
+ */
+export function decorateExternalLinks(main) {
+  main.querySelectorAll('a[href]').forEach((a) => {
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+
+    let url;
+    try {
+      url = new URL(href, window.location.href);
+    } catch {
+      return;
+    }
+
+    const isExternal = url.hostname !== window.location.hostname;
+    const isPdf = url.pathname.toLowerCase().endsWith('.pdf');
+    if (!isExternal && !isPdf) return;
+
+    a.setAttribute('target', '_blank');
+    a.setAttribute('rel', 'noopener noreferrer');
+  });
+}
+
+/**
  * Builds hero block and prepends to main in a new section.
  * @param {Element} main The container element
  */
@@ -207,6 +233,7 @@ function normalizeEsiTables(main) {
 export function decorateMain(main) {
   // hopefully forward compatible button decoration
   decorateButtons(main);
+  decorateExternalLinks(main);
   decorateIcons(main);
   buildAutoBlocks(main);
   normalizeEsiTables(main);
