@@ -1,8 +1,12 @@
 .table .table-scroll {
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
 }
 
 .table table {
+  box-sizing: border-box;
   border: 1px solid var(--border-light-color);
   border-collapse: collapse;
   border-spacing: 0;

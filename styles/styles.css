@@ -294,6 +294,7 @@ main .section.highlight {
 body.blog-post main {
   display: grid;
   gap: 2rem;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 body.blog-post {

@@ -1,10 +1,14 @@
 .mermaid .mermaid-figure {
   margin: 0;
+  max-width: 100%;
 }
 
 .mermaid .mermaid-diagram {
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
   min-height: 120px;
+  overscroll-behavior-x: contain;
 }
 
 /* authored source doubles as the pre-render placeholder; once the SVG is in,
@@ -27,6 +31,7 @@
 
 .mermaid .mermaid-canvas svg {
   display: block;
+  width: 100%;
   max-width: 100%;
   height: auto;
   margin: 0 auto;
@@ -46,4 +51,12 @@
   background-color: #fdecea;
   color: #8a1f11;
   font-size: var(--body-font-size-xs, 14px);
+}
+
+@media (width < 600px) {
+  .mermaid .mermaid-canvas [class~="nodeLabel"],
+  .mermaid .mermaid-canvas [class~="edgeLabel"],
+  .mermaid .mermaid-canvas .cluster-label {
+    font-size: 12px !important;
+  }
 }
